@@ -45,6 +45,9 @@ internal sealed class BugReportSink : ILogEventSink, IDisposable
     /// <summary>The default bug report API endpoint.</summary>
     internal const string DefaultUrl = "https://www.purelogiccode.com/bugreport/api/send-bug-report";
 
+    /// <summary>Log-event property that keeps an expected error out of the bug report API.</summary>
+    internal const string SuppressProperty = "BugReportSuppressed";
+
     private const int MaxMessageLength = 4000;
     private const int MaxStackTraceLength = 8000;
 
@@ -72,6 +75,12 @@ internal sealed class BugReportSink : ILogEventSink, IDisposable
     {
         try
         {
+            /* expected errors (engine callbacks for bad/missing input) are
+             * still written to stderr by the console sink, but they are not
+             * application bugs and must not be reported. */
+            if (logEvent.Properties.ContainsKey(SuppressProperty))
+                return;
+
             lock (SRateLock)
             {
                 if ((DateTime.UtcNow - _sLastSentUtc).TotalSeconds < 5)

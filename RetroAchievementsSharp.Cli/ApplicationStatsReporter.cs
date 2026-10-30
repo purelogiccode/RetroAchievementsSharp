@@ -7,7 +7,9 @@
 //
 // Design rules (same contract as the bug-report sink):
 //  * NEVER writes to stdout/stderr — parity output is untouched.
-//  * All failures are swallowed; the server rate-limits (1 call/hour/IP/app,
+//  * All failures are swallowed and logged at Debug (below the console and
+//    bug-report sink thresholds), so a slow/unreachable stats endpoint never
+//    produces a bug report; the server rate-limits (1 call/hour/IP/app,
 //    HTTP 429) and returns 200 with an error body on auth failure — neither
 //    is treated as an error here.
 //  * The API key is the decoded Constants.BugReportApiKey unless
@@ -77,7 +79,7 @@ internal static class ApplicationStatsReporter
         }
         catch (Exception ex)
         {
-            Log.Warning(ex, "usage telemetry could not be queued");
+            Log.Debug(ex, "usage telemetry could not be queued");
         }
     }
 
@@ -100,7 +102,7 @@ internal static class ApplicationStatsReporter
         }
         catch (Exception ex)
         {
-            Log.Warning(ex, "usage telemetry flush did not complete in time");
+            Log.Debug(ex, "usage telemetry flush did not complete in time");
         }
     }
 
@@ -116,7 +118,7 @@ internal static class ApplicationStatsReporter
         }
         catch (Exception ex)
         {
-            Log.Warning(ex, "usage telemetry request to {Url} failed", url);
+            Log.Debug(ex, "usage telemetry request to {Url} failed", url);
         }
     }
 }

@@ -308,8 +308,10 @@ internal static class Program
     /// <param name="message">the message text</param>
     private static void RhashLogErrorMessage(string message)
     {
-        /* parity-critical: goes to stderr via standardErrorFromLevel */
-        Log.Error("{Message}", message);
+        /* parity-critical: goes to stderr via standardErrorFromLevel. These
+         * are expected input errors (e.g. "Could not open file"), so keep
+         * them out of the bug report API. */
+        Log.ForContext(BugReportSink.SuppressProperty, true).Error("{Message}", message);
     }
 
     /// <summary>Processes a single file for a console.</summary>

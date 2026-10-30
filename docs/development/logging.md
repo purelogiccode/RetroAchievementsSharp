@@ -10,7 +10,7 @@ compares raw stdout/stderr) is the contract, and it stays green.
 |---|---|---|
 | Console (stdout) | `Information` | engine verbose messages (`-v`) and program logs |
 | Console (stderr) | `Error` | engine error messages (via `standardErrorFromLevel`) |
-| Bug report API | `Warning` | Warning+ events, forwarded to the bug report service |
+| Bug report API | `Warning` | Warning+ events, except expected engine error callbacks |
 
 Logging levels used by the code:
 
@@ -19,7 +19,7 @@ Logging levels used by the code:
 | `Information` | engine verbose callback (registered only with `-v` — parity-gated) |
 | `Error` | engine error callback (stderr — parity-gated) |
 | `Fatal` | unhandled exceptions in `Program.Main` |
-| `Debug` | expected-handling catch blocks (`FileUtil`, `Hash3DS`) — below the console threshold, so parity output is never affected |
+| `Debug` | expected-handling catch blocks (`FileUtil`, `Hash3DS`, usage telemetry) — below the console threshold, so parity output is never affected |
 
 ## Bug report forwarding
 
@@ -32,6 +32,11 @@ POST {url}/api/send-bug-report
 X-API-KEY: {api key}
 Content-Type: application/json
 ```
+
+Engine error callbacks (for example `Could not open file` when the user
+passes a missing path) are expected input errors, not application bugs.
+They are still written to stderr for parity but carry the
+`BugReportSuppressed` property, which keeps them out of the bug report API.
 
 ### Configuration (environment variables)
 
