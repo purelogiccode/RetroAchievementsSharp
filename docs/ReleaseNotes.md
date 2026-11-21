@@ -52,6 +52,7 @@ including classic microcomputers.
 | Asset | Platform |
 |---|---|
 | `RetroAchievementsSharp.1.1.0.nupkg` | NuGet library (net8.0 / net9.0 / net10.0 / net11.0) |
+| `RetroAchievementsSharp.Cli.1.1.0.nupkg` | .NET global tool (net8.0, command `retroachievementssharp`) |
 | `retroachievementssharp_v1.1.0_win-x64.zip` | Windows x64 (self-contained, single-file) |
 | `retroachievementssharp_v1.1.0_win-arm64.zip` | Windows arm64 (self-contained, single-file) |
 | `retroachievementssharp_v1.1.0_linux-x64.tar.gz` | Linux x64 (portable) |
@@ -68,14 +69,28 @@ including classic microcomputers.
 Each CLI archive/package includes `LICENSE`, `THIRD-PARTY-NOTICES.md`, and
 `README.md` alongside the binary.
 
+## CLI installation
+
+```powershell
+# Windows Package Manager
+winget install PureLogicCode.RetroAchievementsSharp
+```
+
+```bash
+# .NET global tool (Windows, Linux, macOS with .NET 8+)
+dotnet tool install --global RetroAchievementsSharp.Cli
+```
+
+The self-contained bundles require no .NET installation.
+
 ## CLI quick start
 
 ```bash
-RetroAchievementsSharp NES game.nes
-RetroAchievementsSharp PS1 disc.cue
-RetroAchievementsSharp PS3 game.iso
-RetroAchievementsSharp -s C:\RetroArch\system 3DS game.cia
-RetroAchievementsSharp scan --console PS1 --out hashes.json C:\Roms\PSX
+retroachievementssharp NES game.nes
+retroachievementssharp PS1 disc.cue
+retroachievementssharp PS3 game.iso
+retroachievementssharp -s C:\RetroArch\system 3DS game.cia
+retroachievementssharp scan --console PS1 --out hashes.json C:\Roms\PSX
 ```
 
 ## Library quick start

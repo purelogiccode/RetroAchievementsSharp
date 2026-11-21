@@ -6,7 +6,33 @@
         <AssemblyName>RetroAchievementsSharp.Cli</AssemblyName>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <IsPackable>false</IsPackable>
+
+        <!-- NuGet global tool; install with: dotnet tool install -g RetroAchievementsSharp.Cli -->
+        <IsPackable>true</IsPackable>
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>retroachievementssharp</ToolCommandName>
+        <PackageId>RetroAchievementsSharp.Cli</PackageId>
+        <Version>1.1.0</Version>
+        <Authors>Peterson Fernandes; Pure Logic Code</Authors>
+        <Owners>Peterson Fernandes; Pure Logic Code</Owners>
+        <Title>RetroAchievementsSharp CLI</Title>
+        <Description>A cross-platform .NET tool for RetroAchievements hashing. Native C# port of the RAHasher/rcheevos hashing engine with PS3, CHD, RVZ/WIA, 3DS, cartridge, disc, zip, and m3u support.</Description>
+        <PackageTags>RetroAchievements;rcheevos;RAHasher;hash;hashing;rom;iso;disc;chd;rvz;wia;3ds;nes;snes;n64;playstation;dotnet-tool;cli</PackageTags>
+        <PackageLicenseExpression>GPL-2.0-or-later</PackageLicenseExpression>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageProjectUrl>https://github.com/purelogiccode/RetroAchievementsSharp</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/purelogiccode/RetroAchievementsSharp</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryBranch>master</RepositoryBranch>
+        <PackageReleaseNotes>https://github.com/purelogiccode/RetroAchievementsSharp/blob/master/CHANGELOG.md</PackageReleaseNotes>
+        <Copyright>Copyright (c) 2026 Peterson Fernandes (drpetersonfernandes) and Pure Logic Code</Copyright>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+        <Deterministic>true</Deterministic>
+
         <ApplicationIcon>icon\icon.ico</ApplicationIcon>
         <Company>PureLogicCode.com</Company>
         <AssemblyVersion>1.1.0</AssemblyVersion>
@@ -25,6 +51,13 @@
 
     <ItemGroup>
         <InternalsVisibleTo Include="RetroAchievementsSharp.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\README.md" Pack="true" PackagePath="\" />
+        <None Include="..\LICENSE" Pack="true" PackagePath="\" />
+        <None Include="..\THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="\" />
+        <None Include="icon\icon.png" Pack="true" PackagePath="/" />
     </ItemGroup>
 
     <!-- Ship the user-facing binary as RetroAchievementsSharp(.exe) while the

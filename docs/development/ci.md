@@ -7,7 +7,8 @@ manual dispatch:
 
 - `test` matrix — Ubuntu, Windows, and macOS, with .NET 8/9/10/11 installed;
   restores, builds (warnings are errors), and runs the fast xUnit suite on
-  every target framework.
+  every target framework. It also packs the CLI .NET tool and installs/runs
+  it from a temporary feed.
 - `package` — packs `RetroAchievementsSharp` (`.nupkg` + `.snupkg`) and
   uploads it as a workflow artifact.
 
@@ -41,9 +42,15 @@ All CLI binaries are published with:
 
 The published apphost is copied to the user-facing name
 `RetroAchievementsSharp.exe` (Windows) or `RetroAchievementsSharp`
-(Linux/macOS). The NuGet package is packed with the release version,
-published to NuGet.org on `v*` tags using the `NUGET_API_KEY` secret, and
-attached to the GitHub release too.
+(Linux/macOS). The library and the `RetroAchievementsSharp.Cli` .NET tool are
+packed with the release version, published to NuGet.org on `v*` tags using
+the `NUGET_API_KEY` secret, and attached to the GitHub release too.
+
+After the GitHub release is published, a Windows `winget` job updates the
+`PureLogicCode.RetroAchievementsSharp` manifest in `microsoft/winget-pkgs`
+with `wingetcreate`. It requires the `WINGET_TOKEN` secret (a classic PAT
+with `public_repo`) and is non-blocking, so a winget outage cannot fail the
+release.
 
 Bundles are always staged in
 `RetroAchievementsSharp/bin/Release/` on each runner and uploaded as

@@ -3,6 +3,11 @@
 RetroAchievementsSharp replicates the RAHasher 1.8.4 command line exactly — same arguments,
 same output format, same exit codes.
 
+When installed with `winget` or as the .NET tool, the command is
+`retroachievementssharp`; the self-contained bundles use
+`RetroAchievementsSharp` / `RetroAchievementsSharp.exe`. The arguments and
+output are identical.
+
 ## Synopsis
 
 ```text

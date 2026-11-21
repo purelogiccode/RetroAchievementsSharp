@@ -8,9 +8,18 @@ For the port history, see [ReleaseNotes.md](docs/ReleaseNotes.md) and the
 
 ## [Unreleased]
 
+### Added
+- `RetroAchievementsSharp.Cli` .NET global tool (command
+  `retroachievementssharp`), installable with
+  `dotnet tool install --global RetroAchievementsSharp.Cli`.
+- `winget` package `PureLogicCode.RetroAchievementsSharp` for the portable
+  Windows x64/arm64 CLI bundles.
+
 ### Changed
-- Release workflow publishes the NuGet package and symbols to NuGet.org on
-  every `v*` tag (using the `NUGET_API_KEY` Actions secret).
+- Release workflow publishes the library, the CLI tool, and symbols to
+  NuGet.org on every `v*` tag (using the `NUGET_API_KEY` Actions secret).
+- Release workflow updates the winget manifest on every `v*` tag via
+  `wingetcreate` (using the `WINGET_TOKEN` secret).
 
 ## [1.1.0] - 2026-11-21
 

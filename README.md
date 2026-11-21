@@ -2,6 +2,8 @@
 
 [![NuGet](https://img.shields.io/nuget/v/RetroAchievementsSharp)](https://www.nuget.org/packages/RetroAchievementsSharp)
 [![NuGet downloads](https://img.shields.io/nuget/dt/RetroAchievementsSharp)](https://www.nuget.org/packages/RetroAchievementsSharp)
+[![CLI tool](https://img.shields.io/nuget/v/RetroAchievementsSharp.Cli?label=cli%20tool)](https://www.nuget.org/packages/RetroAchievementsSharp.Cli)
+[![winget](https://img.shields.io/badge/winget-PureLogicCode.RetroAchievementsSharp-0078D4?logo=windows)](https://github.com/microsoft/winget-pkgs/tree/master/manifests/p/PureLogicCode/RetroAchievementsSharp)
 [![CI](https://github.com/purelogiccode/RetroAchievementsSharp/actions/workflows/ci.yml/badge.svg)](https://github.com/purelogiccode/RetroAchievementsSharp/actions/workflows/ci.yml)
 [![.NET](https://img.shields.io/badge/.NET-8.0%20%7C%209.0%20%7C%2010.0%20%7C%2011.0-512BD4)](https://dotnet.microsoft.com/download)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-0078D6)](#cli-downloads)
@@ -21,7 +23,8 @@ use to identify ROMs and disc images.
   targets `net8.0`, `net9.0`, `net10.0`, and `net11.0`; GPL-2.0-or-later.
 - **CLI** — `RetroAchievementsSharp.exe`, byte-identical in behavior to `RAHasher 1.8.4`,
   plus convenience subcommands (`scan`, `identify`, `consoles`, `checkkeys`,
-  `fetch-db`).
+  `fetch-db`). Install with `winget` on Windows or as the
+  `RetroAchievementsSharp.Cli` .NET tool on any OS.
 - **Verified** — 439/439 fast tests + 172/172 slow (parity, real-ROM, RVZ,
   published-DB) green on **each** supported TFM, including a parity harness
   against source-built C oracles, RVZ-vs-ISO equality on real GameCube/Wii
@@ -33,8 +36,21 @@ use to identify ROMs and disc images.
 
 ## Installation
 
-```
+### Library
+
+```sh
 dotnet add package RetroAchievementsSharp
+```
+
+### CLI
+
+```sh
+# Windows Package Manager
+winget install PureLogicCode.RetroAchievementsSharp
+
+# or, on any OS with .NET 8+
+dotnet tool install --global RetroAchievementsSharp.Cli
+retroachievementssharp NES game.nes
 ```
 
 Works with the .NET 8, 9, 10, and 11 SDKs/runtimes on Windows, Linux, macOS,
@@ -290,13 +306,17 @@ on Windows; on Linux the parity cases skip and the ported vectors still run.)
 dotnet pack RetroAchievementsSharp -c Release
 # publishes RetroAchievementsSharp.1.1.0.nupkg + .snupkg (default: bin/Release); make artifacts/:
 dotnet pack RetroAchievementsSharp -c Release -o artifacts
+
+# the CLI .NET tool (net8.0, command: retroachievementssharp)
+dotnet pack RetroAchievementsSharp.Cli -c Release -p:TargetFrameworks=net8.0 -o artifacts
 ```
 
 The package includes the net8/9/10/11 assemblies, XML docs, the GPL-2.0-or-later
 license and third-party notices, SourceLink/symbols, and runs NuGet package
-validation on every pack. The release workflow publishes the package and
-symbols to NuGet.org automatically on every `v*` tag (using the
-`NUGET_API_KEY` Actions secret). Manual push if needed:
+validation on every pack. The release workflow publishes the library, the
+`RetroAchievementsSharp.Cli` .NET tool, and symbols to NuGet.org
+automatically on every `v*` tag (using the `NUGET_API_KEY` Actions secret).
+Manual push if needed:
 
 ```bash
 dotnet nuget push artifacts/RetroAchievementsSharp.1.1.0.nupkg --api-key <key> --source https://api.nuget.org/v3/index.json

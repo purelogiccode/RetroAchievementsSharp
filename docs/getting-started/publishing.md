@@ -54,6 +54,21 @@ AppImage/Flatpak metadata remains under `packaging/flatpak/` and
 `packaging/linux/` for a possible future release, but is not part of the
 default 1.1.0 bundle set.
 
+## Winget
+
+Windows users can install the portable CLI with:
+
+```powershell
+winget install PureLogicCode.RetroAchievementsSharp
+```
+
+The manifests for the current release live under `packaging/winget/<version>/`.
+The release workflow updates the `microsoft/winget-pkgs` manifest with
+`wingetcreate` on every `v*` tag. Configure the repository Actions secret
+`WINGET_TOKEN` with a **classic** GitHub PAT that has the `public_repo` scope
+(fine-grained tokens cannot open PRs against `microsoft/winget-pkgs`).
+The first submission must be merged before automatic updates can run.
+
 ## CI release workflow
 
 `.github/workflows/release.yml`:
@@ -109,11 +124,31 @@ dotnet pack RetroAchievementsSharp -c Release -o artifacts
 This produces `RetroAchievementsSharp.<version>.nupkg` and
 `RetroAchievementsSharp.<version>.snupkg`.
 
+### Packaging the CLI tool
+
+The CLI is also a .NET global tool (`RetroAchievementsSharp.Cli`, command
+`retroachievementssharp`):
+
+```bash
+dotnet pack RetroAchievementsSharp.Cli -c Release -p:TargetFrameworks=net8.0 -o artifacts
+```
+
+Install it from the local feed:
+
+```bash
+dotnet tool install --global --add-source artifacts RetroAchievementsSharp.Cli
+retroachievementssharp NES game.nes
+```
+
+The release workflow packs the tool for `net8.0` and publishes it alongside
+the library.
+
 ### Pushing to NuGet.org
 
-The release workflow publishes both the `.nupkg` and `.snupkg` to NuGet.org
+The release workflow publishes the library and CLI tool packages to NuGet.org
 on every `v*` tag. Configure the repository Actions secret `NUGET_API_KEY`
-with a NuGet.org key that has push permission for `RetroAchievementsSharp`.
+with a NuGet.org key that has push permission for both
+`RetroAchievementsSharp` and `RetroAchievementsSharp.Cli`.
 
 Manual push:
 
@@ -124,17 +159,23 @@ dotnet nuget push artifacts/RetroAchievementsSharp.1.1.0.nupkg \
 dotnet nuget push artifacts/RetroAchievementsSharp.1.1.0.snupkg \
   --api-key <NUGET_API_KEY> \
   --source https://api.nuget.org/v3/index.json
+dotnet nuget push artifacts/RetroAchievementsSharp.Cli.1.1.0.nupkg \
+  --api-key <NUGET_API_KEY> \
+  --source https://api.nuget.org/v3/index.json
 ```
 
 Before a release:
 
 1. Bump `<Version>` in `RetroAchievementsSharp/RetroAchievementsSharp.csproj`
-   and add a `CHANGELOG.md` entry (Keep a Changelog format).
+   and `RetroAchievementsSharp.Cli/RetroAchievementsSharp.Cli.csproj`, update
+   `Program.Version`, and add a `CHANGELOG.md` entry (Keep a Changelog format).
 2. Run the fast suite on every TFM
    (`dotnet test RetroAchievementsSharp.sln -c Release`), then the slow suite
    (`dotnet test RetroAchievementsSharp.Slow.Tests -c Release`).
 3. Build the bundles locally with `scripts/build-release.ps1`, or run the
    release workflow manually.
 4. When the maintainer approves, push a `v<version>` tag. The release
-   workflow creates the GitHub release with all bundles.
-5. Use a NuGet API key scoped to `RetroAchievementsSharp`; never commit it.
+   workflow creates the GitHub release with all bundles, publishes the
+   library and CLI tool to NuGet.org, and updates winget-pkgs.
+5. Use a NuGet API key scoped to both package IDs, and a `WINGET_TOKEN`
+   classic PAT with `public_repo`; never commit either secret.

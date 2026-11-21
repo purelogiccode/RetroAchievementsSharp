@@ -16,6 +16,8 @@
   include the .NET 11 runtime.
 - **Release bundles** — Windows `.zip`; Linux `.tar.gz`/`.deb`/`.rpm`;
   macOS `.dmg`/`.tar.gz`; x64 and arm64.
+- **Install options** — Windows `winget`, the `RetroAchievementsSharp.Cli`
+  .NET global tool, the NuGet library, or a self-contained bundle.
 - **CI and security** — GitHub Actions CI on Windows/Linux/macOS; Dependabot,
   CodeQL, secret scanning, push protection, and private vulnerability
   reporting.

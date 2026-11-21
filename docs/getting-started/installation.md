@@ -21,6 +21,25 @@
 (`dotnet add package RetroAchievementsSharp`) for use from any net8.0+ application —
 see [Packaging the library](publishing.md#packaging-the-library).
 
+## Install the CLI
+
+Windows Package Manager (portable, no .NET install required):
+
+```powershell
+winget install PureLogicCode.RetroAchievementsSharp
+```
+
+.NET global tool (Windows, Linux, macOS with .NET 8+):
+
+```bash
+dotnet tool install --global RetroAchievementsSharp.Cli
+retroachievementssharp NES game.nes
+```
+
+The self-contained single-file bundles for Windows, Linux, and macOS remain
+available from the [GitHub releases](https://github.com/purelogiccode/RetroAchievementsSharp/releases);
+see [Publishing](publishing.md) for the bundle formats.
+
 ## Clone & build
 
 ```bash

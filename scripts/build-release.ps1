@@ -156,11 +156,15 @@ try {
         Write-Warning 'nfpm was not found; .deb/.rpm bundles were skipped. Install nfpm (go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest) or use CI.'
     }
 
-    # ---- NuGet library -----------------------------------------------------
+    # ---- NuGet library + CLI tool -----------------------------------------
     if (-not $SkipNuGet) {
         Write-Host 'Packing NuGet library ...'
         & dotnet pack (Join-Path $repoRoot 'RetroAchievementsSharp/RetroAchievementsSharp.csproj') -c Release -p:Version=$Version -o $OutputRoot | Out-Host
         if ($LASTEXITCODE -ne 0) { throw 'dotnet pack failed' }
+
+        Write-Host 'Packing NuGet CLI tool ...'
+        & dotnet pack (Join-Path $repoRoot 'RetroAchievementsSharp.Cli/RetroAchievementsSharp.Cli.csproj') -c Release -p:TargetFrameworks=net8.0 -p:Version=$Version -o $OutputRoot | Out-Host
+        if ($LASTEXITCODE -ne 0) { throw 'dotnet pack (CLI tool) failed' }
     }
 
     Write-Host ''
