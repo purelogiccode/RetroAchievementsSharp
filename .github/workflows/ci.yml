@@ -63,9 +63,9 @@ jobs:
           dotnet tool install --tool-path "${toolpath}" \
             --add-source "${feed}" RetroAchievementsSharp.Cli
           if [ -f "${toolpath}/retroachievementssharp.exe" ]; then
-            "${toolpath}/retroachievementssharp.exe" >/dev/null
+            "${toolpath}/retroachievementssharp.exe" consoles >/dev/null
           else
-            "${toolpath}/retroachievementssharp" >/dev/null
+            "${toolpath}/retroachievementssharp" consoles >/dev/null
           fi
 
   package:
