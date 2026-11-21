@@ -8,6 +8,14 @@ updates:
       time: "06:00"
       timezone: "Etc/UTC"
     open-pull-requests-limit: 10
+    ignore:
+      # CHDSharp 1.7.0/1.7.1 pull DiagnosticSource 11, which breaks
+      # System.Net.Http on .NET 9; 1.6.3 keeps the net9 graph compatible.
+      # Remove these entries once a fixed 1.7.x release is available.
+      - dependency-name: "CHDSharp"
+        versions:
+          - "1.7.0"
+          - "1.7.1"
     groups:
       nuget:
         patterns:
