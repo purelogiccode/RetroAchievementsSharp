@@ -101,10 +101,15 @@ internal static class ScanCommand
                     }
 
                     var consoleKey = args[++argi];
-                    var consoleId = string.Equals(consoleKey, "?", StringComparison.Ordinal)
-                        ? 1 + ConsoleIds.RcConsoleMax
-                        : Program.FindConsoleId(consoleKey);
-                    if (consoleId == 0)
+                    if (string.Equals(consoleKey, "?", StringComparison.Ordinal))
+                    {
+                        /* explicit auto-detect is the same as omitting --console */
+                        forcedConsoleId = null;
+                        break;
+                    }
+
+                    var consoleId = Program.FindConsoleId(consoleKey);
+                    if (consoleId <= 0 || consoleId > ConsoleIds.RcConsoleMax)
                     {
                         Console.Error.WriteLine("Unknown console \"{0}\"", consoleKey);
                         return 1;
@@ -573,8 +578,9 @@ internal static class ScanCommand
         Console.WriteLine("file the same way the '?' system key works for a single file.");
         Console.WriteLine();
         Console.WriteLine("  -f, --format <text|csv|json>  output format (default: text)");
-        Console.WriteLine("  -c, --console <key|id>        hash every file as this console");
-        Console.WriteLine("                                instead of auto-detecting; the same");
+        Console.WriteLine("  -c, --console <key|id|?>      hash every file as this console");
+        Console.WriteLine("                                instead of auto-detecting ('?' means");
+        Console.WriteLine("                                auto-detect); the same");
         Console.WriteLine("                                flow as the legacy positional CLI");
         Console.WriteLine("                                (zip pre-load, CHD/RVZ, 3DS keys)");
         Console.WriteLine("  -o, --out <file>              write the manifest to this file");

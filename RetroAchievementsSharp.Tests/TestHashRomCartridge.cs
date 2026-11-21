@@ -47,6 +47,19 @@ public class TestHashRomCartridge
         HashIterator.DestroyIterator(iterator);
     }
 
+    private static void TestHashArcadeFromDirectory(string path, string expectedMd5)
+    {
+        /* test file hash */
+        Assert.True(RcHash.GenerateFromFile(out var hashFile, ConsoleIds.RcConsoleArcade, path));
+        Assert.Equal(expectedMd5, hashFile);
+
+        /* file identification using iterator is not supported for directories */
+        var iterator = new RcHashIterator();
+        HashIterator.InitializeIterator(iterator, path, null, 0);
+        Assert.Equal(0, HashIterator.Iterate(out _, iterator));
+        HashIterator.DestroyIterator(iterator);
+    }
+
     /* ========================================================================= */
     /* Arcade                                                                     */
 
@@ -92,6 +105,20 @@ public class TestHashRomCartridge
     public void TestHashArcadeVectors(string path, string expectedMd5)
     {
         TestHashArcade(path, expectedMd5);
+    }
+
+    /* we don't support automatic system discovery for ROMs without extensions */
+    [Theory]
+    [InlineData("game", "c8d46d341bea4fd5bff866a65ff8aea9")]
+    [InlineData("/game", "c8d46d341bea4fd5bff866a65ff8aea9")]
+    [InlineData("\\game", "c8d46d341bea4fd5bff866a65ff8aea9")]
+    [InlineData("roms\\game", "c8d46d341bea4fd5bff866a65ff8aea9")]
+    [InlineData(@"C:\roms\game", "c8d46d341bea4fd5bff866a65ff8aea9")]
+    [InlineData("/home/user/roms/game", "c8d46d341bea4fd5bff866a65ff8aea9")]
+    [InlineData("/home/user/games/game", "c8d46d341bea4fd5bff866a65ff8aea9")]
+    public void TestHashArcadeFromDirectoryVectors(string path, string expectedMd5)
+    {
+        TestHashArcadeFromDirectory(path, expectedMd5);
     }
 
     /* ========================================================================= */

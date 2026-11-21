@@ -53,6 +53,7 @@ and CHD-bound (see the [porting guide](../development/porting-guide.md)).
 | **PSX** | first data track; read `SYSTEM.CNF`, parse `BOOT=cdrom:\...`, MD5 of the boot file **with the exe name prefixed**; fallback to `PSX.EXE` |
 | **PS2** | `BOOT2 = cdrom0:\...` via ISO9660; MD5 of the ELF (with `ELF` marker check) |
 | **PSP** | `PSP_GAME\PARAM.SFO` + `PSP_GAME\SYSDIR\EBOOT.BIN` (MD5 of both); `.pbp` = whole-file |
+| **PS3** | `.iso`/`.chd`: `PS3_GAME\PARAM.SFO` + `PS3_GAME\USRDIR\EBOOT.BIN`; extracted/PKG folders resolve `PARAM.SFO` from the `EBOOT.BIN` layout |
 | **Saturn / Sega CD** | first 512 bytes of sector 0, magic-checked (`SEGA SEGASATURN` / `SEGADISCSYSTEM`) |
 | **PCE-CD** | first data track, header check `PC Engine CD-ROM SYSTEM` |
 | **PC-FX** | largest data track, sector-0 marker check |
@@ -79,3 +80,17 @@ sector boundaries, handling 2352/2048 conversions and the 64 MiB cap — ported
   unbounded copy).
 - Wii/WiiWare malloc-failure checks are N/A in managed code (noted in
   comments).
+
+## 12.5.0 / RAHasher 1.8.4 changes
+
+- **PS3 hashing**: `.iso`/`.chd` discs hash `PS3_GAME/PARAM.SFO` and
+  `PS3_GAME/USRDIR/EBOOT.BIN`; extracted retail, installed PKG, and flat
+  `EBOOT.BIN` layouts resolve `PARAM.SFO` by path, and `.m3u` playlists are
+  supported.
+- **Buffered CD fallback**: a buffered `.cue`/`.m3u`/`.iso`/`.chd` input
+  ignores the buffer and reopens the media from disk.
+- **Differential CHDs**: a child CHD that reports `CHDERR_REQUIRES_PARENT`
+  scans its directory for a CHD whose header MD5/SHA1 matches the parent
+  hashes in the child header, then opens the pair.
+- **Arcade folders**: a path with no extension is hashed by folder name
+  (same as the corresponding romset archive).

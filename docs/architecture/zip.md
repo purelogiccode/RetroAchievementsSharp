@@ -26,7 +26,7 @@ decompressed content.
 |---|---|
 | `RcHashArduboyFx` | `.arduboy` zip: filter to `interp_s2_ArduboyFX.hex` + `.bin` entries |
 | `RcHashMsDos` | DOSZ/DOSC: hashes the zip records, then the sibling `.dosc`, then the parent chain via `*.parent` entries (recursive) |
-| CLI zip pre-load | `.zip` + console ≤ 90 → first entry loaded and hashed via the buffer API (exactly `util::loadZippedFile` + `rc_hash_generate_from_buffer`) |
+| CLI zip pre-load | `.zip` + console ≤ 90 → first entry loaded and hashed via the buffer API (exactly `util::loadZippedFile` + `rc_hash_generate_from_buffer`); Arcade only extracts a single `.neo` entry and hashes every other zip by filename |
 
 ## Test vectors
 

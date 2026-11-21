@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+        <TargetFrameworks>net10.0;net9.0;net8.0;net11.0</TargetFrameworks>
         <OutputType>Exe</OutputType>
         <AssemblyName>RetroAchievementsSharp.Cli</AssemblyName>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -9,8 +9,8 @@
         <IsPackable>false</IsPackable>
         <ApplicationIcon>icon\icon.ico</ApplicationIcon>
         <Company>PureLogicCode.com</Company>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <FileVersion>1.0.0</FileVersion>
+        <AssemblyVersion>1.1.0</AssemblyVersion>
+        <FileVersion>1.1.0</FileVersion>
         <NeutralLanguage>en</NeutralLanguage>
         <DebugType>embedded</DebugType>
         <DebugSymbols>true</DebugSymbols>
@@ -20,11 +20,21 @@
         <ProjectReference Include="..\RetroAchievementsSharp\RetroAchievementsSharp.csproj" />
         <PackageReference Include="Serilog" Version="4.4.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
-    <PackageReference Update="Meziantou.Analyzer" Version="3.0.157" />
+    <PackageReference Update="Meziantou.Analyzer" Version="3.0.341" />
     </ItemGroup>
 
     <ItemGroup>
         <InternalsVisibleTo Include="RetroAchievementsSharp.Tests" />
     </ItemGroup>
+
+    <!-- Ship the user-facing binary as RetroAchievementsSharp(.exe) while the
+         managed assembly stays RetroAchievementsSharp.Cli.dll (a duplicate
+         assembly name would collide with the library in the test output). -->
+    <Target Name="CopyUserFacingExecutable"
+            AfterTargets="Build"
+            Condition="'$(UseAppHost)' == 'true' and Exists('$(TargetDir)$(TargetName)$(_NativeExecutableExtension)')">
+        <Copy SourceFiles="$(TargetDir)$(TargetName)$(_NativeExecutableExtension)"
+              DestinationFiles="$(TargetDir)RetroAchievementsSharp$(_NativeExecutableExtension)" />
+    </Target>
 
 </Project>

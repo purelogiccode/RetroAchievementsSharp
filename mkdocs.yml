@@ -1,8 +1,8 @@
 site_name: RetroAchievementsSharp
 site_description: >-
-  A native C# port of the RAHasher 1.8.3 CLI that produces 100% identical
-  RetroAchievements hashes, evolved to track rcheevos 12.4.0 as the single
-  source of truth.
+  A native C# port of the RAHasher 1.8.4 CLI that produces 100% identical
+  RetroAchievements hashes, tracking rcheevos 12.5.0 as the single source of
+  truth.
 site_url: https://purelogiccode.github.io/RetroAchievementsSharp/
 repo_url: https://github.com/purelogiccode/RetroAchievementsSharp
 edit_uri: blob/master/docs/
@@ -80,6 +80,7 @@ nav:
       - development/porting-guide.md
       - development/logging.md
       - development/sync-rcheevos.md
+      - development/ci.md
       - development/documentation.md
   - Reference:
       - reference/console-table.md

@@ -67,6 +67,17 @@ public static class HashRom
         /* arcade hash is just the hash of the filename (no extension) - the cores are pretty stringent about having the right ROM data */
         var filename = HashEngine.PathGetFilename(iterator.Path!);
         var ext = HashEngine.PathGetExtension(filename);
+
+        if (ext.Length == 0)
+        {
+            /* some emulators will receive a path to the extracted romset instead of a compressed romset.
+             * for those emulators, `iterator->path` will be a folder, and therefore won't have an extension to ignore.
+             * we can assume the folder name is the same as the romset archive name and try to hash it.
+             * since we're not actually hashing the contents of the archive, this is safe to do. */
+            var filenameBytes = Encoding.UTF8.GetBytes(filename);
+            return HashEngine.HashBuffer(out hash, filenameBytes, filenameBytes.Length, iterator);
+        }
+
         var filenameLength = filename.Length - ext.Length - 1;
 
         /* fbneo supports loading subsystems by using specific folder names.

@@ -1,8 +1,7 @@
 # Release-sync playbook
 
 rcheevos is the single source of truth. When a new rcheevos release lands,
-the port is synced mechanically in ~2–3 days using this procedure (Part II,
-phase E6 of the conversion plan).
+the port is synced mechanically in ~2–3 days using this procedure.
 
 ## Scope — no net-new hashing algorithms
 
@@ -71,9 +70,8 @@ newest oracle automatically by search order; bump the order in
 
 ## Step 7 — Document
 
-Update `ConversionPlan.md` (Part II audit table + phase checkboxes),
-`docs/` (hashing semantics, console table, known quirks), and `README.md`
-(parity counts).
+Update `CHANGELOG.md`, `docs/` (hashing semantics, console table, known
+quirks), and `README.md` (parity counts).
 
 ## Checklist
 

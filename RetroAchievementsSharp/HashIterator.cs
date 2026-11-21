@@ -47,10 +47,11 @@ public static class HashIterator
         iterator.Consoles[2] = ConsoleIds.RcConsoleDreamcast;
         iterator.Consoles[3] = ConsoleIds.RcConsoleSegaCd; /* ASSERT: handles both Sega CD and Saturn */
         iterator.Consoles[4] = ConsoleIds.RcConsolePsp;
-        iterator.Consoles[5] = ConsoleIds.RcConsolePcEngineCd;
-        iterator.Consoles[6] = ConsoleIds.RcConsole3Do;
-        iterator.Consoles[7] = ConsoleIds.RcConsoleNeoGeoCd;
-        iterator.Consoles[8] = ConsoleIds.RcConsolePcfx;
+        iterator.Consoles[5] = ConsoleIds.RcConsolePlaystation3;
+        iterator.Consoles[6] = ConsoleIds.RcConsolePcEngineCd;
+        iterator.Consoles[7] = ConsoleIds.RcConsole3Do;
+        iterator.Consoles[8] = ConsoleIds.RcConsoleNeoGeoCd;
+        iterator.Consoles[9] = ConsoleIds.RcConsolePcfx;
     }
 
     private static void InitializeIteratorCue(RcHashIterator iterator, int data)
@@ -122,10 +123,11 @@ public static class HashIterator
     {
         iterator.Consoles[0] = ConsoleIds.RcConsolePlaystation2;
         iterator.Consoles[1] = ConsoleIds.RcConsolePsp;
-        iterator.Consoles[2] = ConsoleIds.RcConsole3Do;
-        iterator.Consoles[3] = ConsoleIds.RcConsoleSegaCd; /* ASSERT: handles both Sega CD and Saturn */
-        iterator.Consoles[4] = ConsoleIds.RcConsoleGamecube;
-        iterator.Consoles[5] = ConsoleIds.RcConsoleWii;
+        iterator.Consoles[2] = ConsoleIds.RcConsolePlaystation3;
+        iterator.Consoles[3] = ConsoleIds.RcConsole3Do;
+        iterator.Consoles[4] = ConsoleIds.RcConsoleSegaCd; /* ASSERT: handles both Sega CD and Saturn */
+        iterator.Consoles[5] = ConsoleIds.RcConsoleGamecube;
+        iterator.Consoles[6] = ConsoleIds.RcConsoleWii;
     }
 
     private static void InitializeIteratorM3U(RcHashIterator iterator, int data)

@@ -929,6 +929,11 @@ public static class HashEngine
         return HashDisc.RcHashPsp(out hash, iterator);
     }
 
+    private static int RcHashPs3(out string hash, RcHashIterator iterator)
+    {
+        return HashDisc.RcHashPs3(out hash, iterator);
+    }
+
     private static int RcHashSegaCd(out string hash, RcHashIterator iterator)
     {
         return HashDisc.RcHashSegaCd(out hash, iterator);
@@ -1099,6 +1104,12 @@ public static class HashEngine
             case ConsoleIds.RcConsolePsp:
                 return RcHashPsp(out hash, iterator);
 
+            case ConsoleIds.RcConsolePlaystation3:
+                if (PathCompareExtension(path, "m3u") != 0)
+                    return GenerateFromPlaylist(out hash, consoleId, iterator);
+
+                return RcHashPs3(out hash, iterator);
+
             case ConsoleIds.RcConsoleSegaCd:
             case ConsoleIds.RcConsoleSaturn:
                 if (PathCompareExtension(path, "m3u") != 0)
@@ -1121,6 +1132,21 @@ public static class HashEngine
         switch (consoleId)
         {
             default:
+                if (iterator.Path != null)
+                {
+                    var ext = PathGetExtension(iterator.Path);
+                    if (string.Equals(ext, "cue", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(ext, "m3u", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(ext, "iso", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(ext, "chd", StringComparison.OrdinalIgnoreCase))
+                    {
+                        /* These extensions are associated to CD media. If buffered data
+                         * was provided, ignore it and try to open the media directly. */
+                        if (FromFile(out hash, consoleId, iterator) != 0)
+                            return 1;
+                    }
+                }
+
                 hash = "";
                 return IteratorErrorFormatted(iterator, "Unsupported console for buffer hash: {0}", consoleId);
 

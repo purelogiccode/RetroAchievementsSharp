@@ -1,6 +1,6 @@
 // Phase 8 — Tier-2 parity tests.
 //
-// For every case in the generated corpus, both executables (RetroAchievementsSharp.Cli.exe and
+// For every case in the generated corpus, both executables (RetroAchievementsSharp.exe and
 // the reference RAHasher 1.8.3 oracle) run with identical arguments and must
 // produce byte-identical stdout/stderr and the same exit code. Cases that
 // carry an ExpectedHash additionally pin the output to the hash recorded by
@@ -13,11 +13,12 @@
 
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using Xunit.Abstractions;
 
 namespace RetroAchievementsSharp.Tests.Parity;
 
-/// <summary>Phase 8 — Tier-2 parity tests. For every case in the generated corpus, both executables (RetroAchievementsSharp.Cli.exe and the reference RAHasher 1.8.3 oracle) run with identical</summary>
+/// <summary>Phase 8 — Tier-2 parity tests. For every case in the generated corpus, both executables (RetroAchievementsSharp.exe and the reference RAHasher 1.8.3 oracle) run with identical</summary>
 public sealed record ParityCase(
     string Label,
     string[] Flags, // CLI flags before the console token; "{SYSTEM}" is replaced with the 3DS system dir
@@ -29,7 +30,7 @@ public sealed record ParityCase(
     bool NormalizeNames = false, // replace "RAHasher"/"RetroAchievementsSharp.Cli" with "RetroAchievementsSharp" before comparing (usage output embeds the exe name)
     string? WorkingDir = null); // default: corpus root
 
-/// <summary>Phase 8 — Tier-2 parity tests. For every case in the generated corpus, both executables (RetroAchievementsSharp.Cli.exe and the reference RAHasher 1.8.3 oracle) run with identical</summary>
+/// <summary>Phase 8 — Tier-2 parity tests. For every case in the generated corpus, both executables (RetroAchievementsSharp.exe and the reference RAHasher 1.8.3 oracle) run with identical</summary>
 public class TestParity
 {
     private readonly ITestOutputHelper _output;
@@ -100,6 +101,13 @@ public class TestParity
             oracleErr = oracleErr.Replace("RAHasher", "RetroAchievementsSharp");
             cliOut = cliOut.Replace("RetroAchievementsSharp.Cli", "RetroAchievementsSharp");
             cliErr = cliErr.Replace("RetroAchievementsSharp.Cli", "RetroAchievementsSharp");
+
+            /* the application release version is independent of the RAHasher
+             * compatibility version, so normalize the usage banner version */
+            var bannerVersion = new Regex(@"(?m)^RetroAchievementsSharp \d+(?:\.\d+)+(?:[-+][^\s]+)?$",
+                RegexOptions.ExplicitCapture, TimeSpan.FromSeconds(1));
+            oracleOut = bannerVersion.Replace(oracleOut, "RetroAchievementsSharp <version>");
+            cliOut = bannerVersion.Replace(cliOut, "RetroAchievementsSharp <version>");
         }
 
         Assert.True(oracle.ExitCode == cli.ExitCode,

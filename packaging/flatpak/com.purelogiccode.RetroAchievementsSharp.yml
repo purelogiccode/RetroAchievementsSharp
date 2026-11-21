@@ -1,0 +1,35 @@
+app-id: com.purelogiccode.RetroAchievementsSharp
+runtime: org.freedesktop.Platform
+runtime-version: "25.08"
+sdk: org.freedesktop.Sdk
+command: retroachievementssharp
+
+finish-args:
+  # hashing reads ROM/disc files from the host
+  - --filesystem=host
+  # identify/fetch-db and telemetry may use the network
+  - --share=network
+
+modules:
+  - name: retroachievementssharp
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 retroachievementssharp /app/bin/retroachievementssharp
+      - install -Dm644 com.purelogiccode.RetroAchievementsSharp.desktop /app/share/applications/com.purelogiccode.RetroAchievementsSharp.desktop
+      - install -Dm644 com.purelogiccode.RetroAchievementsSharp.png /app/share/icons/hicolor/256x256/apps/com.purelogiccode.RetroAchievementsSharp.png
+      - install -Dm644 LICENSE /app/share/licenses/com.purelogiccode.RetroAchievementsSharp/LICENSE
+      - install -Dm644 THIRD-PARTY-NOTICES.md /app/share/licenses/com.purelogiccode.RetroAchievementsSharp/THIRD-PARTY-NOTICES.md
+      - install -Dm644 README.md /app/share/doc/com.purelogiccode.RetroAchievementsSharp/README.md
+    sources:
+      - type: file
+        path: retroachievementssharp
+      - type: file
+        path: com.purelogiccode.RetroAchievementsSharp.desktop
+      - type: file
+        path: com.purelogiccode.RetroAchievementsSharp.png
+      - type: file
+        path: LICENSE
+      - type: file
+        path: THIRD-PARTY-NOTICES.md
+      - type: file
+        path: README.md

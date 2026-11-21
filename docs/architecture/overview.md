@@ -10,7 +10,8 @@ never an accepted difference.
 | Era | Reference | Status |
 |---|---|---|
 | Part I | `References/rcheevos-40d916d` (rcheevos **12.2.1**, the RAHasher 1.8.3 pin) | ported 1:1, phases 0–8 |
-| Part II | `References/rcheevos-12.4.0` (current release) | **single source of truth** — every behavioral question is answered from this tree; sync procedure in [sync-rcheevos](../development/sync-rcheevos.md) |
+| Part II | `References/rcheevos-12.4.0` | 12.4.0 sync (`.neo`, bounds fixes) |
+| Part III | `References/rcheevos-12.5.0` / `References/RAHasher-1.8.4` (current release) | **single source of truth** — every behavioral question is answered from this tree; sync procedure in [sync-rcheevos](../development/sync-rcheevos.md) |
 
 ## Layers
 
@@ -82,6 +83,6 @@ graph TD
 | C# file (`RetroAchievementsSharp.Cli/`) | Reference | Role |
 |---|---|---|
 | `Program.cs` | `RAHasher.cpp` behavior (GPL, reference only) | arg parsing, console resolution, wildcards, zip preload, output |
-| `Consoles.cs` | factual table data from `RAHasher.cpp` | console id/key/group/name metadata (81 entries) |
+| `Consoles.cs` | factual table data from `RAHasher.cpp` | console id/key/group/name metadata (82 entries) |
 
 See the [CLI deep dive](cli.md) for the arg-processing details.

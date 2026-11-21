@@ -53,7 +53,7 @@ file path, for zips).
 | usage / bad args | full console table + usage, exit 1 |
 
 The usage banner matches the C byte-for-byte (modulo the executable name):
-`RetroAchievementsSharp 1.8.3` + `====================` + usage + the `ID Key Group Name`
+`RetroAchievementsSharp 1.1.0` + `====================` + usage + the `ID Key Group Name`
 table with blank lines between groups.
 
 ## Console table quirks

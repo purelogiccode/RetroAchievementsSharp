@@ -15,18 +15,18 @@ used only as local test oracles, never shipped).
 The harness resolves, in order:
 
 1. `RASHARP_ORACLE` env var;
-2. `References\rcheevos-12.4.0\bin64\RAHasher.exe` — **built from rcheevos
-   12.4.0** (the Part II source of truth);
-3. `References\RAHasher-1.8.3\bin64\RAHasher.exe` — built from the pinned
-   1.8.3 sources;
-4. `References\RAHasher.exe` — any other 1.8.3 binary (a legacy build that
+2. `References\rcheevos-12.5.0\bin64\RAHasher.exe` / `RAHasher-1.8.4\bin64\RAHasher.exe`
+   — **built from rcheevos 12.5.0 / RAHasher 1.8.4** (the current source of truth);
+3. `References\rcheevos-12.4.0\bin64\RAHasher.exe` / `RAHasher-1.8.3\bin64\RAHasher.exe`
+   — historical builds;
+4. `References\RAHasher.exe` — any other RAHasher binary (a legacy build that
    only accepts numeric console ids; the harness adapts).
 
 ## Prerequisites (Windows)
 
 - **MSYS2** (`/c/msys64`) with `make`, `sh`, and the MinGW-w64 toolchain
   (`gcc`/`g++` 16.x).
-- **miniz** and **libchdr** sources under `References/RAHasher-1.8.3/src/`
+- **miniz** and **libchdr** sources under `References/RAHasher-1.8.4/src/`
   (cloned; libchdr pinned to v0.3.0 with its vendored deps
   lzma-25.01/zstd-1.5.7/miniz-3.1.1).
 

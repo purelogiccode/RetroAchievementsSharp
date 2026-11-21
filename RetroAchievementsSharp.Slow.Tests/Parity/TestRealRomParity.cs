@@ -1,6 +1,6 @@
 // Real-ROM parity tests: the first 50 files of each local console library
 // (G:\Sega Genesis, G:\Nintendo 64, ...) are hashed by both the reference
-// RAHasher 1.8.3 oracle and the built RetroAchievementsSharp.Cli.exe with identical
+// RAHasher 1.8.3 oracle and the built RetroAchievementsSharp.exe with identical
 // arguments; stdout, stderr, and exit code must match byte-for-byte.
 //
 // These tests are environment-dependent: they skip (with a note) when the
@@ -23,10 +23,25 @@ public class TestRealRomParity
     }
 
 
-    /* the user-specified 1.8.3 oracle (ParityHarness.OraclePath may prefer a
-     * newer rcheevos build — these tests pin the 1.8.3 binary explicitly) */
-    private static readonly string Oracle183 =
-        Path.Combine(ParityHarness.RepoRoot, "References", "RAHasher-1.8.3", "RAHasher.exe");
+    /* the user-specified oracle: prefer the current RAHasher 1.8.4 build,
+     * then the historical 1.8.3 binary */
+    private static readonly string Oracle = FindOracle();
+
+    private static string FindOracle()
+    {
+        foreach (var reference in new[] { "RAHasher-1.8.4", "RAHasher-1.8.3" })
+        {
+            var path = Path.Combine(ParityHarness.RepoRoot, "References", reference, "RAHasher.exe");
+            if (File.Exists(path))
+                return path;
+
+            path = Path.Combine(ParityHarness.RepoRoot, "References", reference, "bin64", "RAHasher.exe");
+            if (File.Exists(path))
+                return path;
+        }
+
+        return Path.Combine(ParityHarness.RepoRoot, "References", "RAHasher.exe");
+    }
 
     /// <summary>The console libraries under test: console id, display name, library path, recursive, system dir (3DS keys).</summary>
     /// <returns>the test rows</returns>
@@ -123,7 +138,7 @@ public class TestRealRomParity
             return;
         }
 
-        if (!File.Exists(Oracle183))
+        if (!File.Exists(Oracle))
         {
             _output.WriteLine(@"SKIPPED (no References\RAHasher-1.8.3\RAHasher.exe): " + consoleName);
             return;
@@ -163,7 +178,7 @@ public class TestRealRomParity
         args.Add(consoleId.ToString());
         args.AddRange(files);
 
-        ParityHarness.Result oracle = ParityHarness.Run(Oracle183, args, libraryPath);
+        ParityHarness.Result oracle = ParityHarness.Run(Oracle, args, libraryPath);
         ParityHarness.Result cli = ParityHarness.Run(ParityHarness.CliPath, args, libraryPath);
 
         var oracleOut = ParityHarness.ToText(oracle.StdOut);

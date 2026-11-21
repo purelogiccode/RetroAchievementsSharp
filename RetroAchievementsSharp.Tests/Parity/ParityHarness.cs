@@ -149,21 +149,28 @@ public static class ParityHarness
 
     private static string? FindOracle()
     {
-        /* The definitive 1.8.3 oracle is built from the pinned sources
-         * (References\RAHasher-1.8.3, Makefile.RAHasher HAVE_CHD=1). Fall back to
-         * any other RAHasher 1.8.3 binary the user provides. */
+        /* The definitive oracle is built from the pinned sources
+         * (References\rcheevos-12.5.0 or RAHasher-1.8.4, Makefile.RAHasher
+         * HAVE_CHD=1). Fall back to older builds or any RAHasher binary the
+         * user provides. */
         var env = Environment.GetEnvironmentVariable("RASHARP_ORACLE");
         if (!string.IsNullOrEmpty(env) && File.Exists(env))
             return env;
 
-        /* Part II: the rcheevos 12.4.0-built oracle is the new source of truth */
-        var v124 = Path.Combine(RepoRoot, "References", "rcheevos-12.4.0", "bin64", "RAHasher.exe");
-        if (File.Exists(v124))
-            return v124;
+        /* rcheevos 12.5.0 / RAHasher 1.8.4 are the current source of truth */
+        foreach (var reference in new[] { "rcheevos-12.5.0", "RAHasher-1.8.4" })
+        {
+            var current = Path.Combine(RepoRoot, "References", reference, "bin64", "RAHasher.exe");
+            if (File.Exists(current))
+                return current;
+        }
 
-        var sourceBuilt = Path.Combine(RepoRoot, "References", "RAHasher-1.8.3", "bin64", "RAHasher.exe");
-        if (File.Exists(sourceBuilt))
-            return sourceBuilt;
+        foreach (var reference in new[] { "rcheevos-12.4.0", "RAHasher-1.8.3" })
+        {
+            var previous = Path.Combine(RepoRoot, "References", reference, "bin64", "RAHasher.exe");
+            if (File.Exists(previous))
+                return previous;
+        }
 
         var legacy = Path.Combine(RepoRoot, "References", "RAHasher.exe");
         return File.Exists(legacy) ? legacy : null;
@@ -186,13 +193,13 @@ public static class ParityHarness
         {
             foreach (var tfm in tfms)
             {
-                var path = Path.Combine(RepoRoot, "RetroAchievementsSharp.Cli", "bin", config, tfm, "RetroAchievementsSharp.Cli.exe");
+                var path = Path.Combine(RepoRoot, "RetroAchievementsSharp.Cli", "bin", config, tfm, "RetroAchievementsSharp.exe");
                 if (File.Exists(path))
                     return path;
             }
         }
 
         throw new FileNotFoundException(
-            "RetroAchievementsSharp.Cli.exe not found — build the solution first (dotnet build RetroAchievementsSharp.sln) or set RASHARP_CLI.");
+            "RetroAchievementsSharp.exe not found — build the solution first (dotnet build RetroAchievementsSharp.sln) or set RASHARP_CLI.");
     }
 }

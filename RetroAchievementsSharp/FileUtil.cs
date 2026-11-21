@@ -124,6 +124,29 @@ public static class FileUtil
         return data;
     }
 
+    /* util::getZippedFilename — name of the only file in the archive, or ""
+     * when the archive is empty, has multiple entries, or holds a directory */
+    /// <summary>util::getZippedFilename — name of the only file in the archive, or "" when the archive is empty, has multiple entries, or holds a directory</summary>
+    /// <param name="path">the zip path</param>
+    /// <returns>the entry name, or an empty string</returns>
+    public static string GetZippedFilename(string path)
+    {
+        try
+        {
+            using var archive = ZipFile.OpenRead(path);
+            if (archive.Entries.Count != 1)
+                return "";
+
+            var entry = archive.Entries[0];
+            return string.IsNullOrEmpty(entry.Name) ? "" : entry.FullName;
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "GetZippedFilename failed for {Path}", path);
+            return "";
+        }
+    }
+
     /* util::loadZippedFile — miniz semantics on ZipArchive:
      * - empty zip -> error, NULL
      * - more than one entry -> error note, hash the entire zip file

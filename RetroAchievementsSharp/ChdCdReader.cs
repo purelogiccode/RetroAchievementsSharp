@@ -19,16 +19,12 @@ public static class ChdCdReader
     private sealed class ChdTrackMetadata
     {
         internal uint Frames;
-        internal uint Pad;
         internal uint Pregap;
         internal uint Postgap;
         internal uint Track;
         internal uint SectorOffset;
         internal uint FrameOffset;
         internal string Type = "";
-        internal string Subtype = "";
-        internal string Pgtype = "";
-        internal string Pgsub = "";
     }
 
     /* struct chd_track_handle_t in HashCHD.cpp */
@@ -192,7 +188,7 @@ public static class ChdCdReader
 
         metadata.Track = ParseUnsignedAfter(text, ref pos, "TRACK:");
         metadata.Type = ParseStringAfter(text, ref pos, "TYPE:");
-        metadata.Subtype = ParseStringAfter(text, ref pos, "SUBTYPE:");
+        _ = ParseStringAfter(text, ref pos, "SUBTYPE:");
         metadata.Frames = ParseUnsignedAfter(text, ref pos, "FRAMES:");
 
         while (pos < text.Length && text[pos] == ' ')
@@ -202,7 +198,7 @@ public static class ChdCdReader
 
         if (StartsWithAt(text, pos, "PAD:"))
         {
-            metadata.Pad = ParseUnsignedAfter(text, ref pos, "PAD:");
+            _ = ParseUnsignedAfter(text, ref pos, "PAD:");
             while (pos < text.Length && text[pos] == ' ')
             {
                 ++pos;
@@ -212,8 +208,8 @@ public static class ChdCdReader
         if (StartsWithAt(text, pos, "PREGAP:"))
         {
             metadata.Pregap = ParseUnsignedAfter(text, ref pos, "PREGAP:");
-            metadata.Pgtype = ParseStringAfter(text, ref pos, "PGTYPE:");
-            metadata.Pgsub = ParseStringAfter(text, ref pos, "PGSUB:");
+            _ = ParseStringAfter(text, ref pos, "PGTYPE:");
+            _ = ParseStringAfter(text, ref pos, "PGSUB:");
             metadata.Postgap = ParseUnsignedAfter(text, ref pos, "POSTGAP:");
         }
     }
@@ -251,16 +247,12 @@ public static class ChdCdReader
             if (meta != null)
             {
                 metadata.Frames = 0;
-                metadata.Pad = 0;
                 metadata.Pregap = 0;
                 metadata.Postgap = 0;
                 metadata.Track = 1;
                 metadata.SectorOffset = 0;
                 metadata.FrameOffset = 0;
                 metadata.Type = "MODE1";
-                metadata.Subtype = "";
-                metadata.Pgtype = "";
-                metadata.Pgsub = "";
                 metadata.Frames = (uint)(file.TotalBytes / file.UnitBytes); /* header->unitcount */
                 return true;
             }
@@ -421,13 +413,153 @@ public static class ChdCdReader
         return bytesRead;
     }
 
+    private static bool IsNonZeroHash(byte[]? hash)
+    {
+        if (hash == null)
+            return false;
+
+        foreach (var value in hash)
+        {
+            if (value != 0)
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool HashEquals(byte[]? candidate, byte[]? expected)
+    {
+        if (candidate == null || expected == null || candidate.Length != expected.Length)
+            return false;
+
+        return candidate.AsSpan().SequenceEqual(expected);
+    }
+
+    /* locate and open the parent of a differential (child) CHD. RALibretro
+     * 1.8.4 scans the child's directory for a CHD whose header hashes match
+     * the parent hashes recorded in the child (HashCHD.cpp). */
+    private static ChdError OpenChdFile(string path, RcHashIterator iterator, out ChdFile? file)
+    {
+        file = null;
+
+        var err = ChdFile.Open(path, out file);
+        if (err == ChdError.Chderrnone)
+            return err;
+
+        if (err != ChdError.Chderrrequiresparent)
+        {
+            HashEngine.IteratorErrorFormatted(iterator, "chd_open failed: {0}", ChdErrorString(err));
+            return err;
+        }
+
+        HashEngine.IteratorVerbose(iterator, "Parent CHD required");
+
+        var headerErr = Chd.ReadHeader(path, out var childHeader);
+        if (headerErr != ChdError.Chderrnone || childHeader == null)
+        {
+            HashEngine.IteratorErrorFormatted(iterator, "chd_read_header failed: {0}", ChdErrorString(headerErr));
+            return headerErr;
+        }
+
+        var filename = HashEngine.PathGetFilename(path);
+        var directory = path.Substring(0, path.Length - filename.Length);
+        if (directory.Length == 0)
+            directory = ".";
+        else if (directory.EndsWith(':'))
+            directory += "\\";
+
+        List<string> matchingFiles;
+        try
+        {
+            matchingFiles = Directory.EnumerateFiles(directory, "*", SearchOption.TopDirectoryOnly)
+                .Select(Path.GetFileName)
+                .Where(name => !string.IsNullOrEmpty(name) && !name.StartsWith('.') &&
+                               string.Equals(Path.GetExtension(name), ".chd", StringComparison.OrdinalIgnoreCase))
+                .Select(name => name!)
+                .ToList();
+        }
+        catch
+        {
+            HashEngine.IteratorErrorFormatted(iterator, "Failed to locate parent chd: {0}", "iterate directory failed");
+            return err;
+        }
+
+        if (matchingFiles.Count == 0)
+        {
+            HashEngine.IteratorErrorFormatted(iterator, "Failed to locate parent chd: {0}", "iterate directory failed");
+            return err;
+        }
+
+        /* assume the parent file will have a similar name and prioritize
+         * anything that starts with the same first four characters */
+        var prioritized = new List<string>(matchingFiles.Count);
+        foreach (var match in matchingFiles)
+        {
+            if (match.Length > 4 && filename.Length > 4 &&
+                string.Compare(match, 0, filename, 0, 4, StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                prioritized.Add(match);
+            }
+        }
+
+        foreach (var match in matchingFiles)
+        {
+            if (!prioritized.Any(item => string.Equals(item, match, StringComparison.Ordinal)))
+                prioritized.Add(match);
+        }
+
+        var hasMd5 = IsNonZeroHash(childHeader.Md5);
+        var hasSha1 = IsNonZeroHash(childHeader.Sha1);
+
+        HashEngine.IteratorVerboseFormatted(iterator, "Scanning for parent chd in {0}", directory);
+
+        string? parentPath = null;
+        var parentsTried = 0;
+        foreach (var match in prioritized)
+        {
+            if (match.Length == filename.Length && string.Equals(match, filename, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            ++parentsTried;
+
+            var parentPathCandidate = directory.EndsWith('/') || directory.EndsWith('\\')
+                ? directory + match
+                : directory + "/" + match;
+
+            if (Chd.ReadHeader(parentPathCandidate, out var parentHeader) != ChdError.Chderrnone || parentHeader == null)
+                continue;
+
+            if (hasMd5 && !HashEquals(parentHeader.Md5, childHeader.ParentMd5))
+                continue;
+            if (hasSha1 && !HashEquals(parentHeader.Sha1, childHeader.ParentSha1))
+                continue;
+
+            HashEngine.IteratorVerboseFormatted(iterator, "Found parent chd ({0} tried): {1}", parentsTried, match);
+            parentPath = parentPathCandidate;
+            break;
+        }
+
+        if (parentPath == null)
+        {
+            HashEngine.IteratorError(iterator, "Could not find parent chd");
+            return err;
+        }
+
+        err = ChdFile.Open(path, parentPath, out file);
+        if (err != ChdError.Chderrnone)
+        {
+            HashEngine.IteratorErrorFormatted(iterator, "chd_open for child failed: {0}", ChdErrorString(err));
+        }
+
+        return err;
+    }
+
     /* rc_hash_handle_chd_open_track */
     private static object? OpenTrackIterator(string path, uint track, RcHashIterator iterator)
     {
-        ChdError err = ChdFile.Open(path, out var file);
+        ChdError err = OpenChdFile(path, iterator, out var file);
         if (err != ChdError.Chderrnone)
         {
-            HashEngine.IteratorErrorFormatted(iterator, "chd_open failed: {0}", ChdErrorString(err));
             return null;
         }
 

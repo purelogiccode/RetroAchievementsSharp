@@ -80,7 +80,7 @@ port inherited the bug and fixed it in Part II).
 
 ## Console coverage
 
-The dispatch covers every console in the 1.8.3/12.2.1 table (81 entries in
+The dispatch covers every console in the 1.8.4/12.5.0 table (82 entries in
 the CLI). Consoles without a dedicated algorithm (GB, GBA, GG, SMS, MD, 2600,
 WS, NGP, …) hash whole-file. See the [console table](../reference/console-table.md)
 and [hashing semantics](../reference/hashing-semantics.md).

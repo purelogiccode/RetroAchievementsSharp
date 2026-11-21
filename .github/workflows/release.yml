@@ -1,0 +1,346 @@
+name: Release bundles
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Bundle version without the leading v (blank = csproj Version)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  DOTNET_NOLOGO: "true"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_TFM: net11.0
+  BUNDLE_DIR: ${{ github.workspace }}/RetroAchievementsSharp/bin/Release
+
+jobs:
+  resolve-version:
+    name: Resolve version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve bundle version
+        id: resolve
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            version="${GITHUB_REF_NAME#v}"
+          else
+            version="${{ inputs.version }}"
+          fi
+          if [[ -z "${version}" ]]; then
+            version=$(awk -F'[<>]' '/<Version>/{print $3; exit}' RetroAchievementsSharp/RetroAchievementsSharp.csproj)
+          fi
+          if [[ ! "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Invalid release version '${version}'"
+            exit 1
+          fi
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+          echo "Building RetroAchievementsSharp ${version}"
+
+  windows:
+    name: Windows ${{ matrix.rid }}
+    runs-on: windows-latest
+    needs: resolve-version
+    strategy:
+      fail-fast: false
+      matrix:
+        rid:
+          - win-x64
+          - win-arm64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 11
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 11.0.x
+
+      - name: Publish ${{ matrix.rid }} (self-contained, single file)
+        shell: pwsh
+        run: |
+          $publish = Join-Path $env:RUNNER_TEMP "publish-${{ matrix.rid }}"
+          dotnet publish RetroAchievementsSharp.Cli/RetroAchievementsSharp.Cli.csproj `
+            -c Release -f $env:DOTNET_TFM -r ${{ matrix.rid }} `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:EnableCompressionInSingleFile=true `
+            -p:DebugType=None -p:DebugSymbols=false `
+            -o $publish
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Package zip
+        shell: pwsh
+        env:
+          VERSION: ${{ needs.resolve-version.outputs.version }}
+        run: |
+          $rid = "${{ matrix.rid }}"
+          $version = $env:VERSION
+          $publish = Join-Path $env:RUNNER_TEMP "publish-$rid"
+          $stage = Join-Path $env:RUNNER_TEMP "stage-$rid"
+          New-Item -ItemType Directory -Force -Path $stage | Out-Null
+          Copy-Item (Join-Path $publish "RetroAchievementsSharp.Cli.exe") (Join-Path $stage "RetroAchievementsSharp.exe")
+          Copy-Item LICENSE, THIRD-PARTY-NOTICES.md, README.md $stage
+          New-Item -ItemType Directory -Force -Path $env:BUNDLE_DIR | Out-Null
+          $zip = Join-Path $env:BUNDLE_DIR "retroachievementssharp_v${version}_${rid}.zip"
+          Compress-Archive -Path (Join-Path $stage "*") -DestinationPath $zip -Force
+          Get-Item $zip | Format-List Name, Length
+
+      - name: Upload bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-${{ matrix.rid }}
+          path: ${{ env.BUNDLE_DIR }}/retroachievementssharp_v${{ needs.resolve-version.outputs.version }}_${{ matrix.rid }}.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  linux:
+    name: Linux ${{ matrix.arch }}
+    needs: resolve-version
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            rid: linux-x64
+            runner: ubuntu-24.04
+            nfpm_arch: amd64
+            deb_arch: amd64
+            rpm_arch: x86_64
+          - arch: arm64
+            rid: linux-arm64
+            runner: ubuntu-24.04-arm
+            nfpm_arch: arm64
+            deb_arch: arm64
+            rpm_arch: aarch64
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 11
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 11.0.x
+
+      - name: Publish ${{ matrix.rid }} (self-contained, single file)
+        shell: bash
+        run: |
+          set -euo pipefail
+          publish="${RUNNER_TEMP}/publish-${{ matrix.rid }}"
+          dotnet publish RetroAchievementsSharp.Cli/RetroAchievementsSharp.Cli.csproj \
+            -c Release -f "${DOTNET_TFM}" -r "${{ matrix.rid }}" \
+            --self-contained true \
+            -p:PublishSingleFile=true \
+            -p:IncludeNativeLibrariesForSelfExtract=true \
+            -p:EnableCompressionInSingleFile=true \
+            -p:DebugType=None -p:DebugSymbols=false \
+            -o "${publish}"
+          chmod +x "${publish}/RetroAchievementsSharp.Cli"
+          mkdir -p "${BUNDLE_DIR}"
+
+      - name: Package tar.gz
+        shell: bash
+        env:
+          VERSION: ${{ needs.resolve-version.outputs.version }}
+          RID: ${{ matrix.rid }}
+        run: |
+          set -euo pipefail
+          stage="${RUNNER_TEMP}/stage-${RID}"
+          folder="retroachievementssharp_v${VERSION}_${RID}"
+          mkdir -p "${stage}/${folder}"
+          cp "${RUNNER_TEMP}/publish-${RID}/RetroAchievementsSharp.Cli" "${stage}/${folder}/RetroAchievementsSharp"
+          cp LICENSE THIRD-PARTY-NOTICES.md README.md "${stage}/${folder}/"
+          tar -C "${stage}" -czf "${BUNDLE_DIR}/${folder}.tar.gz" "${folder}"
+
+      - name: Set up Go for nfpm
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Package deb and rpm
+        shell: bash
+        env:
+          VERSION: ${{ needs.resolve-version.outputs.version }}
+          RID: ${{ matrix.rid }}
+          NFPM_ARCH: ${{ matrix.nfpm_arch }}
+          NFPM_VERSION: ${{ needs.resolve-version.outputs.version }}
+        run: |
+          set -euo pipefail
+          export PATH="${PATH}:$(go env GOPATH)/bin"
+          go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
+          export NFPM_BINARY="${RUNNER_TEMP}/publish-${RID}/RetroAchievementsSharp.Cli"
+          export NFPM_LICENSE="${GITHUB_WORKSPACE}/LICENSE"
+          export NFPM_NOTICES="${GITHUB_WORKSPACE}/THIRD-PARTY-NOTICES.md"
+          export NFPM_README="${GITHUB_WORKSPACE}/README.md"
+          nfpm package --config packaging/linux/nfpm.yaml --packager deb \
+            --target "${BUNDLE_DIR}/retroachievementssharp_v${VERSION}_${{ matrix.deb_arch }}.deb"
+          nfpm package --config packaging/linux/nfpm.yaml --packager rpm \
+            --target "${BUNDLE_DIR}/retroachievementssharp_v${VERSION}-1.${{ matrix.rpm_arch }}.rpm"
+
+      - name: Upload bundles
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-${{ matrix.rid }}
+          path: |
+            ${{ env.BUNDLE_DIR }}/retroachievementssharp_v${{ needs.resolve-version.outputs.version }}_${{ matrix.rid }}.tar.gz
+            ${{ env.BUNDLE_DIR }}/retroachievementssharp_v${{ needs.resolve-version.outputs.version }}_${{ matrix.deb_arch }}.deb
+            ${{ env.BUNDLE_DIR }}/retroachievementssharp_v${{ needs.resolve-version.outputs.version }}-1.${{ matrix.rpm_arch }}.rpm
+          if-no-files-found: error
+          retention-days: 14
+
+  macos:
+    name: macOS ${{ matrix.arch }}
+    needs: resolve-version
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            rid: osx-x64
+            bundle_arch: macos-x64
+            runner: macos-15-intel
+          - arch: arm64
+            rid: osx-arm64
+            bundle_arch: macos-arm64
+            runner: macos-15
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 11
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 11.0.x
+
+      - name: Publish ${{ matrix.rid }} (self-contained, single file)
+        shell: bash
+        run: |
+          set -euo pipefail
+          publish="${RUNNER_TEMP}/publish-${{ matrix.rid }}"
+          dotnet publish RetroAchievementsSharp.Cli/RetroAchievementsSharp.Cli.csproj \
+            -c Release -f "${DOTNET_TFM}" -r "${{ matrix.rid }}" \
+            --self-contained true \
+            -p:PublishSingleFile=true \
+            -p:IncludeNativeLibrariesForSelfExtract=true \
+            -p:EnableCompressionInSingleFile=true \
+            -p:DebugType=None -p:DebugSymbols=false \
+            -o "${publish}"
+          chmod +x "${publish}/RetroAchievementsSharp.Cli"
+          mkdir -p "${BUNDLE_DIR}"
+
+      - name: Package tar.gz and dmg
+        shell: bash
+        env:
+          VERSION: ${{ needs.resolve-version.outputs.version }}
+          BUNDLE_ARCH: ${{ matrix.bundle_arch }}
+          RID: ${{ matrix.rid }}
+        run: |
+          set -euo pipefail
+          stage="${RUNNER_TEMP}/mac-stage-${BUNDLE_ARCH}"
+          folder="retroachievementssharp_v${VERSION}_${BUNDLE_ARCH}"
+          mkdir -p "${stage}/${folder}"
+          cp "${RUNNER_TEMP}/publish-${RID}/RetroAchievementsSharp.Cli" "${stage}/${folder}/RetroAchievementsSharp"
+          cp LICENSE THIRD-PARTY-NOTICES.md README.md "${stage}/${folder}/"
+          chmod +x "${stage}/${folder}/RetroAchievementsSharp"
+          tar -C "${stage}" -czf "${BUNDLE_DIR}/${folder}.tar.gz" "${folder}"
+          hdiutil create -volname "RetroAchievementsSharp ${VERSION}" \
+            -srcfolder "${stage}/${folder}" -ov -format UDZO \
+            "${BUNDLE_DIR}/${folder}.dmg"
+
+      - name: Upload bundles
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-${{ matrix.bundle_arch }}
+          path: |
+            ${{ env.BUNDLE_DIR }}/retroachievementssharp_v${{ needs.resolve-version.outputs.version }}_${{ matrix.bundle_arch }}.tar.gz
+            ${{ env.BUNDLE_DIR }}/retroachievementssharp_v${{ needs.resolve-version.outputs.version }}_${{ matrix.bundle_arch }}.dmg
+          if-no-files-found: error
+          retention-days: 14
+
+  nuget:
+    name: NuGet package
+    runs-on: ubuntu-latest
+    needs: resolve-version
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 11
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 11.0.x
+
+      - name: Pack
+        env:
+          VERSION: ${{ needs.resolve-version.outputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir -p "${BUNDLE_DIR}"
+          dotnet pack RetroAchievementsSharp/RetroAchievementsSharp.csproj \
+            -c Release -p:Version="${VERSION}" -o "${BUNDLE_DIR}"
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-package
+          path: |
+            ${{ env.BUNDLE_DIR }}/*.nupkg
+            ${{ env.BUNDLE_DIR }}/*.snupkg
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-release:
+    name: Publish GitHub release
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    needs:
+      - resolve-version
+      - windows
+      - linux
+      - macos
+      - nuget
+    permissions:
+      contents: write
+    steps:
+      - name: Download all bundles
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/bundles
+          merge-multiple: true
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.resolve-version.outputs.version }}
+        run: |
+          set -euo pipefail
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release upload "${GITHUB_REF_NAME}" "${RUNNER_TEMP}"/bundles/* --clobber
+          else
+            gh release create "${GITHUB_REF_NAME}" "${RUNNER_TEMP}"/bundles/* \
+              --title "RetroAchievementsSharp ${VERSION}" \
+              --generate-notes
+          fi

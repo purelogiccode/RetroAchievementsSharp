@@ -14,7 +14,7 @@ namespace RetroAchievementsSharp.Cli;
 internal static class Program
 {
     /// <summary>The application version string.</summary>
-    internal const string Version = "1.8.3";
+    internal const string Version = "1.1.0";
 
     /// <summary>main.</summary>
     /// <param name="args">the command-line arguments</param>
@@ -347,40 +347,55 @@ internal static class Program
         var hashes = new List<FileHash>();
         var ext = FileUtil.Extension(filePath);
 
-        if (consoleId != ConsoleIds.RcConsoleArcade && consoleId <= ConsoleIds.RcConsoleMax &&
+        if (consoleId <= ConsoleIds.RcConsoleMax &&
             ext.Length == 4 && char.ToLowerInvariant(ext[1]) == 'z' && char.ToLowerInvariant(ext[2]) == 'i' && char.ToLowerInvariant(ext[3]) == 'p')
         {
-            var data = FileUtil.LoadZippedFile(filePath, out _);
-            if (data != null)
+            var loadZipContents = true;
+
+            if (consoleId == ConsoleIds.RcConsoleArcade)
             {
-                if (RcHash.GenerateFromBuffer(out var hash, (uint)consoleId, data, data.Length))
+                /* if the zip contents are a single .neo file, load it.
+                 * otherwise, pass the whole zip file to the hasher. */
+                var unzippedFilename = FileUtil.GetZippedFilename(filePath);
+                var innerExt = FileUtil.Extension(unzippedFilename);
+                loadZipContents = innerExt.Length == 4 && char.ToLowerInvariant(innerExt[1]) == 'n' &&
+                                  char.ToLowerInvariant(innerExt[2]) == 'e' && char.ToLowerInvariant(innerExt[3]) == 'o';
+            }
+
+            if (loadZipContents)
+            {
+                var data = FileUtil.LoadZippedFile(filePath, out _);
+                if (data != null)
                 {
-                    hashes.Add(new FileHash(hash, (uint)consoleId));
+                    if (RcHash.GenerateFromBuffer(out var hash, (uint)consoleId, data, data.Length))
+                    {
+                        hashes.Add(new FileHash(hash, (uint)consoleId));
+                    }
+
+                    return hashes;
+                }
+
+                /* entries >= 2 GiB cannot fit in a byte[] (the C mallocs the full
+                 * entry) — extract to a temp file and hash from disk: same bytes,
+                 * same hash */
+                var tempPath = FileUtil.LoadZippedFileToTemp(filePath, out _);
+                if (tempPath != null)
+                {
+                    try
+                    {
+                        if (RcHash.GenerateFromFile(out var zipFileHash, (uint)consoleId, tempPath))
+                        {
+                            hashes.Add(new FileHash(zipFileHash, (uint)consoleId));
+                        }
+                    }
+                    finally
+                    {
+                        File.Delete(tempPath);
+                    }
                 }
 
                 return hashes;
             }
-
-            /* entries >= 2 GiB cannot fit in a byte[] (the C mallocs the full
-             * entry) — extract to a temp file and hash from disk: same bytes,
-             * same hash */
-            var tempPath = FileUtil.LoadZippedFileToTemp(filePath, out _);
-            if (tempPath != null)
-            {
-                try
-                {
-                    if (RcHash.GenerateFromFile(out var zipFileHash, (uint)consoleId, tempPath))
-                    {
-                        hashes.Add(new FileHash(zipFileHash, (uint)consoleId));
-                    }
-                }
-                finally
-                {
-                    File.Delete(tempPath);
-                }
-            }
-
-            return hashes;
         }
 
         switch (ext.Length)
@@ -463,7 +478,7 @@ internal static class Program
             patternDir = ".";
         }
 
-        var patternName = Path.GetFileName(pattern) ?? "*";
+        var patternName = Path.GetFileName(pattern);
 
         /* Note: FindFirstFileA also matches directories; a directory literally named
          * "x.gb" would produce a "????" line in the original but is skipped here.

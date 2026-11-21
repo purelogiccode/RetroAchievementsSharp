@@ -252,6 +252,9 @@ public static class ConsoleIds
     /// <summary>Id for the Famicom Disk System (81).</summary>
     public const uint RcConsoleFamicomDiskSystem = 81;
 
+    /// <summary>Id for the Sony PlayStation 3 (82).</summary>
+    public const uint RcConsolePlaystation3 = 82;
+
     /// <summary>Id for the RetroAchievements Hubs group (100, not a hashable console).</summary>
     public const uint RcConsoleHubs = 100;
 

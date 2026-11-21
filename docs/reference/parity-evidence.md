@@ -8,14 +8,14 @@ to reproduce it.
 
 | Metric | Value |
 |---|---|
-| Fast suite (`RetroAchievementsSharp.Tests`, in the solution) | **415/415 green** (Debug and Release) |
+| Fast suite (`RetroAchievementsSharp.Tests`, in the solution) | **439/439 green** (Debug and Release) |
 | Slow suite (`RetroAchievementsSharp.Slow.Tests`, run manually) | **172/172 green** |
-| Tier-2 parity cases | **90/90 byte-identical** vs the rcheevos **12.4.0**-built oracle |
+| Tier-2 parity cases | **90/90 byte-identical** vs the source-built C oracle (RAHasher 1.8.4 / rcheevos 12.5.0 preferred) |
 | RVZ-vs-ISO cases | **6/6** — real GameCube/Wii RVZ images hashed live via RVZSharp equal the DolphinTool-converted ISO hashes |
 | Real-ROM parity cases | **61/61 byte-identical** vs the pinned **1.8.3** binary (user libraries, incl. 3DS with user keys) |
 | Tier-1 ported vectors | all upstream `test/rhash` vectors green |
 | CLI output | byte-identical (stdout + stderr + exit codes), including verbose mode and error paths |
-| Platforms | `net8.0;net9.0;net10.0` (415/415 + 172/172 green on each); CLI publishes win-x64/arm64 + linux-x64/arm64 |
+| Platforms | `net8.0;net9.0;net10.0;net11.0` (439/439 + 172/172 green on each); CLI publishes win/linux/macos x64+arm64 |
 
 ## The tiers
 
@@ -49,7 +49,7 @@ to reproduce it.
 
 The Tier-2 suite is not decorative — it found real port bugs in Part I:
 
-1. **Arg-count guard off-by-one** — `RetroAchievementsSharp.Cli.exe 4` crashed with an
+1. **Arg-count guard off-by-one** — `RetroAchievementsSharp.exe 4` crashed with an
    unhandled exception instead of printing usage (fixed).
 2. **Wildcard path construction** diverged from `FindFirstFile`/`util::directory`
    semantics (fixed, incl. the `dir/*.bin` quirk reproduction).
@@ -69,7 +69,9 @@ the C mallocs the full entry. Fixed with a disk-backed fallback
 
 | Oracle | Source | Used for |
 |---|---|---|
-| `References\rcheevos-12.4.0\bin64\RAHasher.exe` | rcheevos 12.4.0 + RAHasher CLI stack + libchdr v0.3.0 | current default (Part II) |
+| `References\rcheevos-12.5.0\bin64\RAHasher.exe` | rcheevos 12.5.0 + RAHasher 1.8.4 CLI stack | current default |
+| `References\RAHasher-1.8.4\bin64\RAHasher.exe` | RAHasher 1.8.4 sources | current fallback |
+| `References\rcheevos-12.4.0\bin64\RAHasher.exe` | rcheevos 12.4.0 + RAHasher 1.8.3 CLI stack | Part II evidence |
 | `References\RAHasher-1.8.3\bin64\RAHasher.exe` | pinned 1.8.3 sources (12.2.1) | Part I evidence |
 | `References\RAHasher.exe` | legacy 1.8.3 binary (numeric ids only) | fallback |
 

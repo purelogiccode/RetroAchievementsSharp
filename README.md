@@ -6,21 +6,24 @@
 [![Repo](https://img.shields.io/badge/github-purelogiccode%2FRetroAchievementsSharp-181717?logo=github)](https://github.com/purelogiccode/RetroAchievementsSharp)
 
 A native C# port of the **RAHasher** hashing engine (`rcheevos`
-`40d916d` → 12.4.0) that produces **100% identical hashes** to the original
-for every supported console — the same hashes the
+`40d916d` → 12.5.0, RAHasher 1.8.4) that produces **100% identical hashes**
+to the original for every supported console — the same hashes the
 [RetroAchievements](https://retroachievements.org) website and its clients
 use to identify ROMs and disc images.
 
 - **Library** — `RetroAchievementsSharp` ([NuGet](https://www.nuget.org/packages/RetroAchievementsSharp)),
-  targets `net8.0`, `net9.0`, and `net10.0`; GPL-2.0-or-later.
-- **CLI** — `RetroAchievementsSharp.Cli.exe`, byte-identical in behavior to `RAHasher 1.8.3`,
+  targets `net8.0`, `net9.0`, `net10.0`, and `net11.0`; GPL-2.0-or-later.
+- **CLI** — `RetroAchievementsSharp.exe`, byte-identical in behavior to `RAHasher 1.8.4`,
   plus convenience subcommands (`scan`, `identify`, `consoles`, `checkkeys`,
   `fetch-db`).
-- **Verified** — 415/415 fast tests + 172/172 slow (parity, real-ROM, RVZ,
+- **Verified** — 439/439 fast tests + 172/172 slow (parity, real-ROM, RVZ,
   published-DB) green on **each** supported TFM, including a parity harness
   against source-built C oracles, RVZ-vs-ISO equality on real GameCube/Wii
   discs, and spot checks against the published RetroAchievements game
   database.
+- **1.1.0 highlights** — PS3 hashing, differential CHDs, `scan --console`/
+  `--out`, CI/release automation, and security hardening. See
+  [WHATS_NEW.md](WHATS_NEW.md).
 
 ## Installation
 
@@ -28,12 +31,25 @@ use to identify ROMs and disc images.
 dotnet add package RetroAchievementsSharp
 ```
 
-Works with the .NET 8, 9, and 10 SDKs/runtimes on Windows, Linux, macOS,
-x64 and arm64.
+Works with the .NET 8, 9, 10, and 11 SDKs/runtimes on Windows, Linux, macOS,
+x64 and arm64. The release CLI bundles the .NET 11 runtime, so end users do
+not need .NET installed.
+
+### CLI downloads
+
+| Platform | Architectures | Formats |
+|---|---|---|
+| Windows | x64, arm64 | `.zip` |
+| Linux | x64, arm64 | `.deb`, `.rpm`, `.tar.gz` |
+| macOS | x64, arm64 | `.dmg`, `.tar.gz` |
+
+Every archive/package contains `LICENSE`, `THIRD-PARTY-NOTICES.md`, and
+`README.md` alongside the self-contained `RetroAchievementsSharp`
+executable.
 
 ## Using the library
 
-Requires **.NET 8, 9, or 10** (older runtimes are not supported). Add the
+Requires **.NET 8, 9, 10, or 11** (older runtimes are not supported). Add the
 package:
 
 ```
@@ -132,18 +148,19 @@ if (RcHash.GenerateFromFile(out string hash, ConsoleIds.RcConsoleNintendo3Ds, "g
 ## Supported formats
 
 Raw ROMs (all cartridge consoles), `.zip` (pre-loaded ROM, Arduboy FX,
-DOSZ/Zip64/DOSC), `.m3u` playlists, discs (`.cue`/`.bin`/`.iso`/`.gdi`/`.chd`,
-GameCube/Wii `.rvz`/`.wia`),
+DOSZ/Zip64/DOSC), `.m3u` playlists, discs (`.cue`/`.bin`/`.iso`/`.gdi`/`.chd`
+including differential CHDs with a parent, GameCube/Wii `.rvz`/`.wia`),
+PS3 `.iso`/`.chd`, extracted disc folders and PKG layouts,
 3DS `.cia`/`.3ds`/`.3dsx` (keys via `-s` / `Hash3Ds.InitHash3Ds`), and
 Neo Geo `.neo` carts. Console list: NES/Famicom, SNES/SFC, N64, GB/GBC/GBA,
 Master System, Mega Drive/Genesis, Game Gear, 32X, SG-1000, PCE/TG-16,
-PCE-CD, Saturn, Sega CD, Dreamcast, PS1, PS2, PSP, 3DO, PC-FX, Jaguar(+CD),
-Neo Geo Pocket(+Color), Neo Geo CD, NDS/DSi/3DS — the full rcheevos console
-table (~59 consoles), including classic microcomputers.
+PCE-CD, Saturn, Sega CD, Dreamcast, PS1, PS2, PSP, PS3, 3DO, PC-FX,
+Jaguar(+CD), Neo Geo Pocket(+Color), Neo Geo CD, NDS/DSi/3DS — the full
+rcheevos console table (~59 consoles), including classic microcomputers.
 
 ## CLI usage
 
-Identical to RAHasher 1.8.3:
+Identical to RAHasher 1.8.4:
 
 ```
 RetroAchievementsSharp [-v] [-s systempath] system filepath...
@@ -225,38 +242,56 @@ Full details for every subcommand: [docs/getting-started/usage.md](docs/getting-
 dotnet build RetroAchievementsSharp.sln -c Release
 ```
 
-Requires any .NET 8+ SDK. All three projects multi-target `net8.0;net9.0;net10.0`
-(CHDSharp, VideoGameFileSystemParser 1.2.0 and Serilog 4.4.0 all ship
-portable libs for these TFMs). Build a single target with
-`-f net8.0` (faster).
+Requires the .NET 11 SDK (see `global.json`). All three projects multi-target
+`net8.0;net9.0;net10.0;net11.0`; the library package is compatible with
+.NET 8, 9, 10, and 11. Build a single target with `-f net8.0` (faster).
 
 ## Publishing the CLI
 
-Self-contained single-file executables (no runtime needed on the target):
+The release bundles are self-contained single-file executables with the .NET 11
+runtime bundled (no runtime install needed on the target):
 
-```sh
-dotnet publish RetroAchievementsSharp.Cli -c Release -r win-x64    --self-contained true -p:PublishSingleFile=true -o artifacts/win-x64
-dotnet publish RetroAchievementsSharp.Cli -c Release -r linux-x64  --self-contained true -p:PublishSingleFile=true -o artifacts/linux-x64
+| Platform | Architectures | Formats |
+|---|---|---|
+| Windows | x64, arm64 | `.zip` |
+| Linux | x64, arm64 | `.deb`, `.rpm`, `.tar.gz` |
+| macOS | x64, arm64 | `.dmg`, `.tar.gz` |
+
+Build locally on Windows:
+
+```powershell
+./scripts/build-release.ps1 -Version 1.1.0
 ```
 
-Produces `RetroAchievementsSharp.Cli.exe` (Windows) / `RetroAchievementsSharp` (Linux) in `artifacts\<rid>\`.
-(The parity suite's oracle is a Windows PE, so Tier-2 parity runs on Windows;
-on Linux the parity cases skip and the ported vectors still run.)
+Bundles are written to `RetroAchievementsSharp/bin/Release/` and existing files
+there are never deleted. Full CI/release details:
+[docs/getting-started/publishing.md](docs/getting-started/publishing.md).
+
+Manual publish example:
+
+```sh
+dotnet publish RetroAchievementsSharp.Cli -c Release -f net11.0 -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o artifacts/win-x64
+```
+
+The published apphost is `RetroAchievementsSharp.Cli.exe`; release scripts copy
+it to `RetroAchievementsSharp.exe` (and to `RetroAchievementsSharp` on
+Linux/macOS). (The parity suite's oracle is a Windows PE, so Tier-2 parity runs
+on Windows; on Linux the parity cases skip and the ported vectors still run.)
 
 ## Packaging the NuGet library
 
 ```sh
 dotnet pack RetroAchievementsSharp -c Release
-# publishes RetroAchievementsSharp.1.0.0.nupkg + .snupkg (default: bin/Release); make artifacts/:
+# publishes RetroAchievementsSharp.1.1.0.nupkg + .snupkg (default: bin/Release); make artifacts/:
 dotnet pack RetroAchievementsSharp -c Release -o artifacts
 ```
 
-The package includes the net8/9/10 assemblies, XML docs, the GPL-2.0-or-later
+The package includes the net8/9/10/11 assemblies, XML docs, the GPL-2.0-or-later
 license and third-party notices, SourceLink/symbols, and runs NuGet package
 validation on every pack. Publishing to NuGet.org:
 
 ```bash
-dotnet nuget push artifacts/RetroAchievementsSharp.1.0.0.nupkg --api-key <key> --source https://api.nuget.org/v3/index.json
+dotnet nuget push artifacts/RetroAchievementsSharp.1.1.0.nupkg --api-key <key> --source https://api.nuget.org/v3/index.json
 ```
 
 See [publishing.md](docs/getting-started/publishing.md) for details.
@@ -267,7 +302,7 @@ Tests are split into two projects:
 
 ```bash
 dotnet test RetroAchievementsSharp.sln -c Release          # fast suite, all TFMs (net8, net9, net10)
-dotnet test RetroAchievementsSharp.sln -f net10.0          # fast suite, one TFM
+dotnet test RetroAchievementsSharp.sln -f net11.0          # fast suite, one TFM
 dotnet test RetroAchievementsSharp.Slow.Tests -c Release   # slow suite (manual — not in the sln)
 ```
 
@@ -277,7 +312,7 @@ zip, m3u, handler order), synthetic 3DS/CHD fixtures, and CLI/engine unit
 tests. The **slow suite** (`RetroAchievementsSharp.Slow.Tests`, kept out of the solution —
 172 tests, minutes) is run manually and covers:
 
-- **Tier-2 parity harness** vs. a source-built C oracle (rcheevos 12.4.0,
+- **Tier-2 parity harness** vs. a source-built C oracle (rcheevos 12.5.0,
   falling back to the pinned 1.8.3 build): 90 generated cases + all CLI arg
   modes; stdout/stderr + exit codes byte-identical.
 - **RVZ validation** — real GameCube/Wii RVZ images hashed live through
@@ -296,8 +331,8 @@ unsupported-format behavior (ROM encoding not part of rcheevos).
 
 ## Parity evidence
 
-Current: **415/415 fast + 172/172 slow green on net8.0, net9.0, net10.0** —
-byte-identical CLI output between `RetroAchievementsSharp.Cli.exe` and the C oracles,
+Current: **439/439 fast + 172/172 slow green on net8.0, net9.0, net10.0, net11.0** —
+byte-identical CLI output between `RetroAchievementsSharp.exe` and the C oracles,
 including verbose mode, error paths, and exit codes; RVZ-vs-ISO equality
 6/6 (GameCube and Wii); real-ROM parity 61/61; published-hash spot-check
 15/15 library/console pairs. The harness has caught and fixed real port bugs

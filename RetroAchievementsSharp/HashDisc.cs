@@ -1179,6 +1179,117 @@ public static class HashDisc
         return HashEngine.Finalize(iterator, md5, out hash);
     }
 
+    private static int RcHashPs3Disc(HashMd5 md5, RcHashIterator iterator, object? trackHandle)
+    {
+        /* https://www.psdevwiki.com/ps3/PARAM.SFO
+         * PS3_GAME/PARAM.SFO contains key/value pairs identifying the game for the system (i.e. serial number,
+         * name, version). PS3_GAME/USRDIR/EBOOT.BIN is the encrypted primary executable. */
+        var sector = (uint)CdFindFileSector(iterator, trackHandle, @"PS3_GAME\PARAM.SFO", out var size);
+        if (sector == 0)
+            return HashEngine.IteratorError(iterator, "Not a PS3 game disc");
+
+        if (CdFile(md5, iterator, trackHandle, sector, null, size, @"PS3_GAME\PARAM.SFO") == 0)
+            return 0;
+
+        sector = (uint)CdFindFileSector(iterator, trackHandle, @"PS3_GAME\USRDIR\EBOOT.BIN", out size);
+        if (sector == 0)
+            return HashEngine.IteratorError(iterator, "Could not find primary executable");
+
+        if (CdFile(md5, iterator, trackHandle, sector, null, size, @"PS3_GAME\USRDIR\EBOOT.BIN") == 0)
+            return 0;
+
+        return 1;
+    }
+
+    private static void AppendFileToMd5(HashMd5 md5, RcHashIterator iterator, object fileHandle)
+    {
+        var buffer = new byte[4096];
+        int numRead;
+        do
+        {
+            numRead = HashEngine.FileRead(iterator, fileHandle, buffer, buffer.Length);
+            if (numRead != 0)
+                md5.Append(buffer, numRead);
+        } while (numRead == buffer.Length);
+    }
+
+    private static int RcHashPs3File(HashMd5 md5, RcHashIterator iterator)
+    {
+        var path = iterator.Path!;
+        int dirLength;
+
+        /* Determine PARAM.SFO location based on directory layout:
+         *   Retail extracted: .../PS3_GAME/USRDIR/EBOOT.BIN -> .../PS3_GAME/PARAM.SFO
+         *   PKG installed:    .../TITLE_ID/USRDIR/EBOOT.BIN -> .../TITLE_ID/PARAM.SFO
+         *   ELF flat:         .../EBOOT.BIN                 -> .../PARAM.SFO
+         */
+        var match = path.IndexOf("PS3_GAME/USRDIR/", StringComparison.Ordinal);
+        if (match < 0)
+            match = path.IndexOf(@"PS3_GAME\USRDIR\", StringComparison.Ordinal);
+        if (match >= 0)
+        {
+            dirLength = match + 9; /* strlen("PS3_GAME/") == strlen("PS3_GAME\\") == 9 */
+        }
+        else
+        {
+            match = path.IndexOf("USRDIR/", StringComparison.Ordinal);
+            if (match < 0)
+                match = path.IndexOf(@"USRDIR\", StringComparison.Ordinal);
+            if (match >= 0)
+                dirLength = match;
+            else
+                dirLength = path.Length - HashEngine.PathGetFilename(path).Length;
+        }
+
+        var sfoPath = path.Substring(0, dirLength) + "PARAM.SFO";
+
+        var fileHandle = HashEngine.FileOpen(iterator, sfoPath);
+        if (fileHandle == null)
+            return HashEngine.IteratorError(iterator, "Not a PS3 game folder");
+
+        AppendFileToMd5(md5, iterator, fileHandle);
+        HashEngine.FileClose(iterator, fileHandle);
+
+        fileHandle = HashEngine.FileOpen(iterator, path);
+        if (fileHandle == null)
+            return HashEngine.IteratorError(iterator, "Could not open primary executable");
+
+        AppendFileToMd5(md5, iterator, fileHandle);
+        HashEngine.FileClose(iterator, fileHandle);
+        return 1;
+    }
+
+    /// <summary>Hashes a PlayStation 3 disc or extracted/PKG game folder.</summary>
+    /// <param name="hash">the generated 32-char hash</param>
+    /// <param name="iterator">the hash iterator</param>
+    /// <returns>the result</returns>
+    public static int RcHashPs3(out string hash, RcHashIterator iterator)
+    {
+        hash = "";
+        var md5 = new HashMd5();
+        int result;
+
+        if (HashEngine.PathCompareExtension(iterator.Path!, "iso") != 0 ||
+            HashEngine.PathCompareExtension(iterator.Path!, "chd") != 0)
+        {
+            var trackHandle = CdOpenTrack(iterator, 1);
+            if (trackHandle == null)
+                return HashEngine.IteratorError(iterator, "Could not open track");
+
+            result = RcHashPs3Disc(md5, iterator, trackHandle);
+            CdCloseTrack(iterator, trackHandle);
+        }
+        else
+        {
+            result = RcHashPs3File(md5, iterator);
+        }
+
+        if (result != 0)
+            return HashEngine.Finalize(iterator, md5, out hash);
+
+        return result;
+    }
+
     /// <summary>Hashes a Sega CD / Saturn disc (first 512 bytes of sector 0).</summary>
     /// <param name="hash">the generated 32-char hash</param>
     /// <param name="iterator">the hash iterator</param>

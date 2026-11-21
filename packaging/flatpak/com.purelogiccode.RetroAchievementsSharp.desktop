@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=RetroAchievementsSharp
+Comment=Hash ROMs and disc images for RetroAchievements
+Exec=retroachievementssharp
+Icon=com.purelogiccode.RetroAchievementsSharp
+Terminal=true
+Categories=Utility;Emulator;
+Keywords=RetroAchievements;ROM;hash;hashing;emulator;

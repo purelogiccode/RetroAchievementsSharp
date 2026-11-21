@@ -41,6 +41,7 @@ internal static class Consoles
         new(12, "PS1", Sony, "PlayStation"),
         new(21, "PS2", Sony, "PlayStation 2"),
         new(41, "PSP", Sony, "PlayStation Portable"),
+        new(82, "PS3", null, "PlayStation 3"),
 
         new(25, "2600", Atari, "Atari 2600"),
         new(51, "7800", Atari, "Atari 7800"),

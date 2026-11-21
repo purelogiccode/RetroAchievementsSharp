@@ -3,25 +3,45 @@
 All notable changes to **RetroAchievementsSharp** are documented here (keep-a-changelog format).
 
 The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-For the port history and the evolution plan, see `ConversionPlan.md`.
+For the port history, see [ReleaseNotes.md](docs/ReleaseNotes.md) and the
+`docs/` site.
 
-## [Unreleased]
-
-### Changed
-- **Renamed from RASharp to RetroAchievementsSharp** — NuGet package id,
-  solution/projects/assemblies, namespaces (`RetroAchievementsSharp` /
-  `RetroAchievementsSharp.Models`), CLI binary, and the repository moved to
-  `https://github.com/purelogiccode/RetroAchievementsSharp`. The old
-  `RASharp` package id was already taken on NuGet.org.
+## [1.1.0] - 2026-11-21
 
 ### Added
-- NuGet packaging for `RetroAchievementsSharp` (net8.0;net9.0;net10.0, SourceLink, XML
-  docs, symbols, package validation), package icon, and CHANGELOG.md.
+- **PlayStation 3 hashing** (rcheevos 12.5.0): `.iso`/`.chd` discs hash
+  `PS3_GAME/PARAM.SFO` and `PS3_GAME/USRDIR/EBOOT.BIN`; extracted retail
+  discs, installed PKG folders, flat `EBOOT.BIN` layouts, and `.m3u`
+  playlists are supported. The CLI console table now lists PS3 (id 82).
+- **Differential CHD support** (RAHasher 1.8.4): a child CHD that needs its
+  parent now finds the matching parent in the same directory by comparing
+  the header MD5/SHA1 hashes. This fixes the `Could not open track` failure
+  for parent/child CHD sets.
+- **Arcade extracted-romset hashing** (rcheevos 12.5.0): a path without an
+  extension is hashed by folder name, like the corresponding zip.
+- **Buffered CD fallback** (rcheevos 12.5.0): buffered `.cue`/`.m3u`/`.iso`/
+  `.chd` inputs ignore the buffer and reopen the media from disk.
+- **CI, release automation, and security policy**: GitHub Actions CI on
+  Windows/Linux/macOS; release bundles for Windows/Linux/macOS x64+arm64;
+  Dependabot, CodeQL, secret scanning, and private vulnerability reporting.
+- `scan --console` and `scan --out` for forced-console batch hashing and
+  atomic manifest files; JSON rows include the full `path`.
 
 ### Changed
-- All projects multi-target `net8.0;net9.0;net10.0` instead of `net10.0`
-  only (`Convert.ToHexStringLower` and `System.Threading.Lock` are gated on
-  `NET9_0_OR_GREATER` for net8 compatibility).
+- Synced the hashing engine to **RAHasher 1.8.4 / rcheevos 12.5.0**.
+- Arcade `.zip` handling matches 1.8.4: a single `.neo` entry is hashed by
+  content; every other zip is hashed by filename.
+- CLI binary is now `RetroAchievementsSharp.exe` on Windows and
+  `RetroAchievementsSharp` on Linux/macOS. Release bundles use the
+  `retroachievementssharp_v<version>_<rid>` naming convention.
+- All projects target `net8.0;net9.0;net10.0;net11.0`; the library package is
+  compatible with .NET 8, 9, 10, and 11.
+- CHDSharp 1.6.3 is used on every TFM. CHDSharp 1.7.x pulls
+  `Microsoft.Extensions.Logging.Abstractions` 11, whose
+  `System.Diagnostics.DiagnosticSource` 11 dependency breaks
+  `System.Net.Http` on .NET 9; 1.7.0/1.7.1 had no public API or reader
+  changes (TFM support and encoder fixes only).
+- Test suite: **439/439 fast tests + 172/172 slow tests** green on each TFM.
 - Parity harness prefers the CLI built for the test assembly's own TFM.
 
 ## [1.0.0] - 2026-08-15
@@ -68,4 +88,5 @@ For the port history and the evolution plan, see `ConversionPlan.md`.
 
 ---
 
+[1.1.0]: https://github.com/purelogiccode/RetroAchievementsSharp/releases/tag/v1.1.0
 [1.0.0]: https://github.com/purelogiccode/RetroAchievementsSharp/releases/tag/v1.0.0

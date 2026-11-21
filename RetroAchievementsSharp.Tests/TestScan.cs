@@ -286,14 +286,14 @@ public class TestScan : IDisposable
 
     /* end-to-end: the Program.Run dispatch must route "scan" to the
      * subcommand when the real CLI binary is invoked (the parity harness
-     * runs the freshly built RetroAchievementsSharp.Cli.exe) */
+     * runs the freshly built RetroAchievementsSharp.exe) */
     /// <summary>Tests that the real CLI binary dispatches the scan subcommand.</summary>
     [Fact]
     public void ScanDispatchThroughCliExe()
     {
         if (!OperatingSystem.IsWindows())
         {
-            return; /* the parity harness locates RetroAchievementsSharp.Cli.exe (Windows apphost) */
+            return; /* the parity harness locates RetroAchievementsSharp.exe (Windows apphost) */
         }
 
         var gb = TestDataGen.GenerateGenericFile(131072);
@@ -345,6 +345,20 @@ public class TestScan : IDisposable
         Assert.Equal(5, row.GetProperty("consoleId").GetInt32());
         Assert.Equal(Md5Hex(gb), row.GetProperty("hash").GetString());
         Assert.Equal(Path.GetFullPath(Path.Combine(_root, "game.gb")), row.GetProperty("path").GetString());
+    }
+
+    /// <summary>Tests that --console ? keeps auto-detection and reports the detected console.</summary>
+    [Fact]
+    public void ScanForcedConsoleQuestionMarkAutoDetects()
+    {
+        var nes = TestDataGen.GenerateNesFile(32, true, out _);
+        WriteFile("game.nes", nes);
+
+        var (exit, stdout, stderr) = RunScan("--console", "?", _root);
+
+        Assert.Equal(0, exit);
+        Assert.Contains($"{Nes32KHash} NES game.nes", stdout, StringComparison.Ordinal);
+        Assert.Contains("Scanned 1 file(s): 1 hashed, 0 failed", stderr, StringComparison.Ordinal);
     }
 
     /// <summary>Tests that unknown --console values fail with an error.</summary>

@@ -1,7 +1,8 @@
 # Hashing semantics
 
 How each console's hash is computed. All algorithms are 1:1 translations of
-rcheevos `40d916d` (12.2.1) + the 12.4.0 deltas; details per module in the
+rcheevos 12.5.0 (originally `40d916d`, 12.2.1, plus the 12.4.0/12.5.0
+deltas); details per module in the
 [architecture](../architecture/overview.md) section.
 
 ## Universal rules
@@ -29,7 +30,7 @@ rcheevos `40d916d` (12.2.1) + the 12.4.0 deltas; details per module in the
 | Console | Hash input |
 |---|---|
 | Atari 7800 | ROM after the 128-byte `ATARI7800` header (when present) |
-| Arcade (romset zip) | **filename** (no extension) + FBNeo subsystem folder |
+| Arcade (romset zip/folder) | **filename** (no extension) + FBNeo subsystem folder; a `.zip` with a single `.neo` entry is hashed by content |
 | Arcade (`.neo`) | ROM data after the 4096-byte `NEO\1` header (Geolith carts) |
 | Arduboy | zip filtered to `interp_s2_ArduboyFX.hex` + `.bin` entries |
 | MS-DOS (`.dosz`/`.dosc`) | zip record hashes + sibling `.dosc` + parent chain |
@@ -41,6 +42,7 @@ rcheevos `40d916d` (12.2.1) + the 12.4.0 deltas; details per module in the
 | PSX | `SYSTEM.CNF` → `BOOT=cdrom:\...` executable (exe-name prefix + contents); fallback `PSX.EXE` |
 | PS2 | `BOOT2 = cdrom0:\...` ELF via ISO9660 |
 | PSP | `PSP_GAME\PARAM.SFO` + `PSP_GAME\SYSDIR\EBOOT.BIN`; `.pbp` whole-file |
+| PS3 | `PS3_GAME\PARAM.SFO` + `PS3_GAME\USRDIR\EBOOT.BIN` for `.iso`/`.chd`; extracted retail/PKG folders and flat ELFs resolve `PARAM.SFO` from the path |
 | Saturn / Sega CD | first 512 bytes of sector 0 (magic-checked) |
 | PCE-CD | first data track sector-0 header region |
 | PC-FX | largest data track, sector-0 marker |
@@ -65,4 +67,5 @@ Keys from `aes_keys.txt` + `seeddb.bin` via `-s` (see
 ## Zip pre-load (CLI)
 
 `.zip` + console ≤ 90 → the **first entry** is extracted and hashed via the
-buffer API (`util::loadZippedFile` semantics).
+buffer API (`util::loadZippedFile` semantics). For Arcade, only a single
+`.neo` entry is extracted; other zips are hashed by filename.

@@ -7,6 +7,8 @@
 //   multi.chd — 3 tracks (AUDIO 300 + MODE2/2352 271 + AUDIO 200)
 
 using CHDSharp;
+using CHDSharp.Encoder;
+using CHDSharp.Encoder.Models;
 using RetroAchievementsSharp.Models;
 using VideoGameFileSystemParser.Models;
 
@@ -208,7 +210,6 @@ public class TestChdCdReader
                     "AUDIO" => 2352u,
                     "MODE1" => 2048u,
                     "MODE1_RAW" => 2048u,
-                    "MODE2_RAW" => 2352u,
                     _ => 2352u
                 };
                 Assert.Equal(expectedDataSize, (uint)tracks[i].DataSize);
@@ -238,6 +239,42 @@ public class TestChdCdReader
         ChdCdReader.InitChdCdreader();
         Assert.True(RcHash.GenerateFromFile(out var hash, ConsoleIds.RcConsolePsp, TestDataPath("psp.chd")));
         Assert.Equal("a7070bf07f5c1a0afb2b2d202d7e3893", hash);
+    }
+
+    /// <summary>Tests that a differential CHD finds its parent in the same directory.</summary>
+    [Fact]
+    public void TestChdHashPsxWithParent()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "rasharp_chd_parent_" + Guid.NewGuid().ToString("N")[..8]);
+        Directory.CreateDirectory(directory);
+
+        try
+        {
+            /* a differential child stores hunks that match the parent as
+             * COMPRESSION_PARENT references; hashing it requires reopening the
+             * parent from the child's directory (RAHasher 1.8.4 / HashCHD.cpp) */
+            var parent = Path.Combine(directory, "psx.chd");
+            File.Copy(TestDataPath("psx.chd"), parent);
+            var child = Path.Combine(directory, "psx (clone).chd");
+
+            ChdEncoder.Copy(parent, child, [CodecTags.Zlib, CodecTags.Lzma],
+                new ChdEncodeOptions { ParentPath = parent }, CancellationToken.None);
+
+            ChdCdReader.InitChdCdreader();
+            Assert.True(RcHash.GenerateFromFile(out var hash, ConsoleIds.RcConsolePlaystation, child));
+            Assert.Equal("db433fb038cde4fb15c144e8c7dea6e3", hash);
+        }
+        finally
+        {
+            try
+            {
+                Directory.Delete(directory, recursive: true);
+            }
+            catch
+            {
+                /* best effort cleanup */
+            }
+        }
     }
 
     /* ========================================================================= */

@@ -19,8 +19,8 @@ Run the slow suite explicitly (it is not part of the solution):
 dotnet test RetroAchievementsSharp.Slow.Tests -c Release
 ```
 
-**Current state: 415/415 fast tests green, 172/172 slow tests green
-(Debug + Release), parity 90/90 vs the rcheevos 12.4.0-built oracle,
+**Current state: 439/439 fast tests green, 172/172 slow tests green
+(Debug + Release), parity 90/90 vs the source-built C oracle,
 RVZ-vs-ISO 6/6, 61/61 real-ROM cases vs the pinned 1.8.3 binary, and
 published-hash spot checks (see
 [Parity evidence](../reference/parity-evidence.md)).**
@@ -57,19 +57,19 @@ the shared `ParityHarness` and generators. Run it explicitly:
 
 ```bash
 dotnet build RetroAchievementsSharp.sln                 # build the fast project first
-dotnet test  RetroAchievementsSharp.Slow.Tests -f net10.0   # one TFM: slow suites re-run the same engine, and DolphinTool conversions are serialized
+dotnet test  RetroAchievementsSharp.Slow.Tests -f net11.0   # one TFM: slow suites re-run the same engine, and DolphinTool conversions are serialized
 ```
 
 !!! note "Run one TFM"
     The slow suite is environment-dependent and takes minutes — run a single
-    TFM (`-f net10.0`). Running all three TFMs in parallel triples the time
+    TFM (`-f net11.0`). Running all four TFMs in parallel multiplies the time
     with no extra coverage; the RVZ cases serialize their DolphinTool
     conversions via a cross-process mutex, so concurrent runs no longer
     collide on Dolphin's temporary FST file.
 
 | File | What it runs |
 |---|---|
-| `TestParity.cs` | the generated-corpus parity harness vs. the rcheevos 12.4.0-built oracle (90 cases; `RASHARP_ORACLE` to override) |
+| `TestParity.cs` | the generated-corpus parity harness vs. the source-built C oracle (90 cases; `RASHARP_ORACLE` to override) |
 | `TestRealRomParity.cs` | first files of 60 user library directories vs. the pinned 1.8.3 binary |
 | `TestRvzParity.cs` | real GameCube/Wii RVZ images — live RVZSharp hash must equal the DolphinTool-converted ISO hash (6 cases) |
 | `TestPublishedHashMatch.cs` | real ROM samples hashed and looked up in the official RA game-database snapshot |
@@ -131,7 +131,7 @@ The harness also supports an ad-hoc external corpus — point `RASHARP_ORACLE`
 at a C-built binary and run both CLIs over any file:
 
 ```bash
-RAHasher.exe PS1 game.cue   vs.   RetroAchievementsSharp.Cli.exe PS1 game.cue
+RAHasher.exe PS1 game.cue   vs.   RetroAchievementsSharp.exe PS1 game.cue
 ```
 
 ## Filters
@@ -157,7 +157,7 @@ nothing user-specific is required.
 
 ```bash
 dotnet build RetroAchievementsSharp.sln -c Release            # must be warning-free (TreatWarningsAsErrors)
-dotnet test  RetroAchievementsSharp.sln -c Release            # 415/415 fast
-dotnet test  RetroAchievementsSharp.sln -c Debug              # 415/415 fast
+dotnet test  RetroAchievementsSharp.sln -c Release            # 439/439 fast
+dotnet test  RetroAchievementsSharp.sln -c Debug              # 439/439 fast
 dotnet test  RetroAchievementsSharp.Slow.Tests -c Release     # 172/172 slow (manual)
 ```

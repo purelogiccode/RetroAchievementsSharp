@@ -61,7 +61,7 @@ application decodes it at startup and uses the real value. An explicit
 === Environment Details ===
 Date: 2026-08-12 01:08:03 -03:00
 Application Name: RetroAchievementsSharp
-Application Version: 1.8.3
+Application Version: 1.1.0
 OS Version: Microsoft Windows NT 10.0.26200.0
 Architecture: X64
 Bitness: 64
@@ -102,7 +102,7 @@ At **application launch** the CLI reports a usage hit to the
 ```text
 POST {url}
 Authorization: Bearer {api key}
-{"applicationId": "RetroAchievementsSharp", "version": "1.8.3"}
+{"applicationId": "RetroAchievementsSharp", "version": "1.1.0"}
 ```
 
 ### Configuration (environment variables)

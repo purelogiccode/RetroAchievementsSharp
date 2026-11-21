@@ -1,29 +1,30 @@
 # RetroAchievementsSharp
 
-**A native C# port of the RAHasher 1.8.3 CLI that produces 100 % identical
+**A native C# port of the RAHasher 1.8.4 CLI that produces 100 % identical
 RetroAchievements hashes — now tracking the current rcheevos release
-(12.4.0) as the single source of truth.**
+(12.5.0) as the single source of truth.**
 
 RetroAchievementsSharp is a GPL-2.0-or-later class library + CLI that hashes ROMs and disc
 images exactly the way RetroAchievements identifies games: same algorithms,
 same constants, same edge cases, byte-for-byte. The engine is a 1:1
 translation of the `rc_hash` module of [rcheevos](https://github.com/RetroAchievements/rcheevos),
 originally pinned to the RAHasher 1.8.3 submodule commit (`40d916d`,
-rcheevos 12.2.1) and since evolved to rcheevos 12.4.0.
+rcheevos 12.2.1) and since evolved to rcheevos 12.5.0 / RAHasher 1.8.4.
 
 ## Highlights
 
-- **100 % parity, proven** — a Tier-2 harness runs `RetroAchievementsSharp.Cli.exe` and the
+- **100 % parity, proven** — a Tier-2 harness runs `RetroAchievementsSharp.exe` and the
   original C binaries with identical arguments and requires byte-identical
   stdout/stderr and equal exit codes: **90/90 corpus cases green** against
-  the rcheevos 12.4.0-built oracle; **415/415 fast tests + 172/172 slow
-  tests green on each of net8.0, net9.0, net10.0** (Debug + Release).
-- **81 consoles** in the CLI table — cartridge, disc, encrypted (3DS), CHD,
-  RVZ/WIA (GameCube/Wii, hashed live — no rvz→iso conversion),
-  zip-based (Arduboy FX, DOSZ/DOSC) and `.neo` Neo Geo cart formats.
+  the source-built C oracle; **439/439 fast tests + 172/172 slow
+  tests green on each of net8.0, net9.0, net10.0, net11.0** (Debug + Release).
+- **82 consoles** in the CLI table — cartridge, disc, encrypted (3DS), CHD
+  (including differential parent/child sets), PS3, RVZ/WIA (GameCube/Wii,
+  hashed live — no rvz→iso conversion), zip-based (Arduboy FX, DOSZ/DOSC)
+  and `.neo` Neo Geo cart formats.
 - **Cross-platform** — `RetroAchievementsSharp` is a NuGet library targeting
-  `net8.0;net9.0;net10.0`; the CLI publishes self-contained single-file
-  executables for Windows x64/arm64 and Linux x64/arm64.
+  `net8.0;net9.0;net10.0;net11.0`; the CLI publishes self-contained single-file
+  executables for Windows x64/arm64, Linux x64/arm64, and macOS x64/arm64.
 - **Honest engineering** — the port reproduces the original's quirks
   (64 MiB whole-file cap, `atoi` console-key fallback, wildcard path
   construction) *and* inherits its bugfixes (the 12.4.0 `merge_callbacks`
@@ -40,9 +41,9 @@ rcheevos 12.2.1) and since evolved to rcheevos 12.4.0.
 dotnet build RetroAchievementsSharp.sln -c Release
 dotnet test  RetroAchievementsSharp.sln -c Release
 
-RetroAchievementsSharp.Cli/bin/Release/net10.0/RetroAchievementsSharp.Cli.exe NES game.nes
-RetroAchievementsSharp.Cli/bin/Release/net10.0/RetroAchievementsSharp.Cli.exe PS1 disc.cue
-RetroAchievementsSharp.Cli/bin/Release/net10.0/RetroAchievementsSharp.Cli.exe '?' unknown.bin
+RetroAchievementsSharp.Cli/bin/Release/net11.0/RetroAchievementsSharp.exe NES game.nes
+RetroAchievementsSharp.Cli/bin/Release/net11.0/RetroAchievementsSharp.exe PS1 disc.cue
+RetroAchievementsSharp.Cli/bin/Release/net11.0/RetroAchievementsSharp.exe '?' unknown.bin
 ```
 
 ## Project status
@@ -51,6 +52,7 @@ RetroAchievementsSharp.Cli/bin/Release/net10.0/RetroAchievementsSharp.Cli.exe '?
 |---|---|---|
 | Part I (phases 0–8) | Port of RAHasher 1.8.3 / rcheevos `40d916d` (12.2.1) | ✅ Complete — 82/82 parity vs the source-built 1.8.3 oracle |
 | Part II (phases E0–E6) | Evolution to rcheevos 12.4.0 (single source of truth) | ✅ Complete — 12.4.0 oracle; E5 real-world validation done (real-ROM parity 61/61 + published-hash spot checks 15/15); release-sync playbook published |
+| Part III | Sync to RAHasher 1.8.4 / rcheevos 12.5.0 | ✅ Complete — PS3 hashing, differential CHDs, buffered CD fallback, arcade folders |
 
 ## Documentation map
 
@@ -79,7 +81,7 @@ RetroAchievementsSharp/               the hashing engine (class library)
 RetroAchievementsSharp.Cli/                the RAHasher-compatible command line
 RetroAchievementsSharp.Tests/              ported rcheevos vectors + the Tier-2 parity harness
 References/                 read-only reference material (never shipped):
-                            rcheevos-12.4.0, rcheevos-40d916d, RAHasher-1.8.3,
+                            rcheevos-12.5.0, RAHasher-1.8.4, dolphin-master,
                             C oracle binaries (GPL, local test oracles only)
 ```
 

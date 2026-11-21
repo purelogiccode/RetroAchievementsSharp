@@ -1,6 +1,6 @@
 # Console table
 
-The CLI console table (81 entries) — id, key, RA group, display name. Keys
+The CLI console table (82 entries) — id, key, RA group, display name. Keys
 are case-insensitive; **NULL-group consoles accept numeric ids only** (the
 `find_console_id` fallback is `atoi` — see [known quirks](known-quirks.md)).
 
@@ -25,6 +25,7 @@ are case-insensitive; **NULL-group consoles accept numeric ids only** (the
 | 12 | `PS1` | SONY | PlayStation |
 | 21 | `PS2` | SONY | PlayStation 2 |
 | 41 | `PSP` | SONY | PlayStation Portable |
+| 82 | `PS3` |  | PlayStation 3 |
 | 25 | `2600` | ATARI | Atari 2600 |
 | 51 | `7800` | ATARI | Atari 7800 |
 | 17 | `JAG` | ATARI | Atari Jaguar |

@@ -60,7 +60,7 @@ maintainable, and reviewable.
 3. Add corpus cases (success + error paths) in `TestParity`.
 4. `dotnet test` — all green, then optionally run the parity cases against
    both oracles (`RASHARP_ORACLE`).
-5. Update `ConversionPlan.md` and this documentation.
+5. Update `CHANGELOG.md` and this documentation.
 
 ## Review checklist
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="console-application">
+  <id>com.purelogiccode.RetroAchievementsSharp</id>
+  <name>RetroAchievementsSharp</name>
+  <summary>Hash ROMs and disc images for RetroAchievements</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0-or-later</project_license>
+  <description>
+    <p>
+      RetroAchievementsSharp is a native C# port of the RetroAchievements
+      hashing engine (rcheevos/RAHasher). It computes the same hashes used by
+      RetroAchievements to identify cartridge ROMs, disc images, archives,
+      playlists, and encrypted 3DS content.
+    </p>
+  </description>
+  <url type="homepage">https://github.com/purelogiccode/RetroAchievementsSharp</url>
+  <url type="bugtracker">https://github.com/purelogiccode/RetroAchievementsSharp/issues</url>
+  <developer_name>Pure Logic Code</developer_name>
+  <content_rating type="oars-1.1"/>
+</component>

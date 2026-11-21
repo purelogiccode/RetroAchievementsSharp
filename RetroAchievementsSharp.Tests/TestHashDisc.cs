@@ -1013,6 +1013,184 @@ public class TestHashDisc
 
     /* ========================================================================= */
 
+    /// <summary>Tests hashing of a PS3 disc image.</summary>
+    [Fact]
+    public void TestHashPs3()
+    {
+        const int paramSfoSize = 690;
+        var paramSfo = TestDataGen.GenerateGenericFile(paramSfoSize);
+        const int ebootBinSize = 273470;
+        var ebootBin = TestDataGen.GenerateGenericFile(ebootBinSize);
+        var image = TestDataGenDisc.GenerateIso9660Bin(160, "TEST", out var imageSize);
+        const string expectedMd5 = "27ec2f9b7238b2ef29af31ddd254f201";
+
+        TestDataGenDisc.GenerateIso9660File(image, "PS3_GAME\\PARAM.SFO", paramSfo, paramSfoSize);
+        TestDataGenDisc.GenerateIso9660File(image, @"PS3_GAME\USRDIR\EBOOT.BIN", ebootBin, ebootBinSize);
+
+        MockFilereader.MockFile(0, "game.iso", image, imageSize);
+
+        /* test file hash */
+        Assert.True(RcHash.GenerateFromFile(out var hashFile, ConsoleIds.RcConsolePlaystation3, "game.iso"));
+
+        /* test file identification from iterator */
+        var iterator = new RcHashIterator();
+        HashIterator.InitializeIterator(iterator, "game.iso", null, 0);
+        Assert.True(HashIterator.Iterate(out var hashIterator, iterator) != 0);
+        HashIterator.DestroyIterator(iterator);
+
+        Assert.Equal(expectedMd5, hashFile);
+        Assert.Equal(expectedMd5, hashIterator);
+    }
+
+    /// <summary>Tests hashing of a PS3 disc image without PARAM.SFO.</summary>
+    [Fact]
+    public void TestHashPs3NoParamSfo()
+    {
+        const int ebootBinSize = 273470;
+        var ebootBin = TestDataGen.GenerateGenericFile(ebootBinSize);
+        var image = TestDataGenDisc.GenerateIso9660Bin(160, "TEST", out var imageSize);
+
+        /* PS3_GAME/PARAM.SFO is missing - not a PS3 game disc */
+        TestDataGenDisc.GenerateIso9660File(image, @"PS3_GAME\USRDIR\EBOOT.BIN", ebootBin, ebootBinSize);
+
+        MockFilereader.MockFile(0, "game.iso", image, imageSize);
+
+        Assert.False(RcHash.GenerateFromFile(out _, ConsoleIds.RcConsolePlaystation3, "game.iso"));
+
+        var iterator = new RcHashIterator();
+        HashIterator.InitializeIterator(iterator, "game.iso", null, 0);
+        Assert.Equal(0, HashIterator.Iterate(out _, iterator));
+        HashIterator.DestroyIterator(iterator);
+    }
+
+    /// <summary>Tests hashing of a PS3 disc image without EBOOT.BIN.</summary>
+    [Fact]
+    public void TestHashPs3NoEboot()
+    {
+        const int paramSfoSize = 690;
+        var paramSfo = TestDataGen.GenerateGenericFile(paramSfoSize);
+        var image = TestDataGenDisc.GenerateIso9660Bin(160, "TEST", out var imageSize);
+
+        /* PS3_GAME/USRDIR/EBOOT.BIN is missing - could not find primary executable */
+        TestDataGenDisc.GenerateIso9660File(image, "PS3_GAME\\PARAM.SFO", paramSfo, paramSfoSize);
+
+        MockFilereader.MockFile(0, "game.iso", image, imageSize);
+
+        Assert.False(RcHash.GenerateFromFile(out _, ConsoleIds.RcConsolePlaystation3, "game.iso"));
+
+        var iterator = new RcHashIterator();
+        HashIterator.InitializeIterator(iterator, "game.iso", null, 0);
+        Assert.Equal(0, HashIterator.Iterate(out _, iterator));
+        HashIterator.DestroyIterator(iterator);
+    }
+
+    /// <summary>Tests hashing of a PS3 game via m3u playlist.</summary>
+    [Fact]
+    public void TestHashPs3M3U()
+    {
+        const int paramSfoSize = 690;
+        var paramSfo = TestDataGen.GenerateGenericFile(paramSfoSize);
+        const int ebootBinSize = 273470;
+        var ebootBin = TestDataGen.GenerateGenericFile(ebootBinSize);
+        var image = TestDataGenDisc.GenerateIso9660Bin(160, "TEST", out var imageSize);
+        const string expectedMd5 = "27ec2f9b7238b2ef29af31ddd254f201";
+
+        TestDataGenDisc.GenerateIso9660File(image, "PS3_GAME\\PARAM.SFO", paramSfo, paramSfoSize);
+        TestDataGenDisc.GenerateIso9660File(image, @"PS3_GAME\USRDIR\EBOOT.BIN", ebootBin, ebootBinSize);
+
+        MockFilereader.MockFile(0, "game.iso", image, imageSize);
+        MockFilereader.MockFileText(1, "game.m3u", "game.iso");
+
+        Assert.True(RcHash.GenerateFromFile(out var hashFile, ConsoleIds.RcConsolePlaystation3, "game.m3u"));
+
+        var iterator = new RcHashIterator();
+        HashIterator.InitializeIterator(iterator, "game.m3u", null, 0);
+        Assert.True(HashIterator.Iterate(out var hashIterator, iterator) != 0);
+        HashIterator.DestroyIterator(iterator);
+
+        Assert.Equal(expectedMd5, hashFile);
+        Assert.Equal(expectedMd5, hashIterator);
+    }
+
+    /// <summary>Tests hashing of an extracted PS3 disc folder.</summary>
+    [Fact]
+    public void TestHashPs3ExtractedDisc()
+    {
+        const int paramSfoSize = 690;
+        var paramSfo = TestDataGen.GenerateGenericFile(paramSfoSize);
+        const int ebootBinSize = 273470;
+        var ebootBin = TestDataGen.GenerateGenericFile(ebootBinSize);
+        const string expectedMd5 = "27ec2f9b7238b2ef29af31ddd254f201";
+
+        MockFilereader.MockFile(0, "PS3_GAME/PARAM.SFO", paramSfo, paramSfoSize);
+        MockFilereader.MockFile(1, "PS3_GAME/USRDIR/EBOOT.BIN", ebootBin, ebootBinSize);
+
+        Assert.True(RcHash.GenerateFromFile(out var hashFile, ConsoleIds.RcConsolePlaystation3, "PS3_GAME/USRDIR/EBOOT.BIN"));
+        Assert.Equal(expectedMd5, hashFile);
+    }
+
+    /// <summary>Tests hashing of a PS3 installed PKG layout.</summary>
+    [Fact]
+    public void TestHashPs3InstalledPkg()
+    {
+        const int paramSfoSize = 690;
+        var paramSfo = TestDataGen.GenerateGenericFile(paramSfoSize);
+        const int ebootBinSize = 273470;
+        var ebootBin = TestDataGen.GenerateGenericFile(ebootBinSize);
+        const string expectedMd5 = "27ec2f9b7238b2ef29af31ddd254f201";
+
+        MockFilereader.MockFile(0, "PARAM.SFO", paramSfo, paramSfoSize);
+        MockFilereader.MockFile(1, "USRDIR/EBOOT.BIN", ebootBin, ebootBinSize);
+
+        Assert.True(RcHash.GenerateFromFile(out var hashFile, ConsoleIds.RcConsolePlaystation3, "USRDIR/EBOOT.BIN"));
+        Assert.Equal(expectedMd5, hashFile);
+    }
+
+    /// <summary>Tests hashing of a flat PS3 ELF.</summary>
+    [Fact]
+    public void TestHashPs3FlatElf()
+    {
+        const int paramSfoSize = 690;
+        var paramSfo = TestDataGen.GenerateGenericFile(paramSfoSize);
+        const int ebootBinSize = 273470;
+        var ebootBin = TestDataGen.GenerateGenericFile(ebootBinSize);
+        const string expectedMd5 = "27ec2f9b7238b2ef29af31ddd254f201";
+
+        MockFilereader.MockFile(0, "PARAM.SFO", paramSfo, paramSfoSize);
+        MockFilereader.MockFile(1, "EBOOT.BIN", ebootBin, ebootBinSize);
+
+        Assert.True(RcHash.GenerateFromFile(out var hashFile, ConsoleIds.RcConsolePlaystation3, "EBOOT.BIN"));
+        Assert.Equal(expectedMd5, hashFile);
+    }
+
+    /// <summary>Tests buffered hashing falls back to the file for CD extensions.</summary>
+    [Fact]
+    public void TestHashSegaCdBuffered()
+    {
+        const int imageSize = 512;
+        var image = TestDataGen.GenerateGenericFile(imageSize);
+        const string expectedMd5 = "574498e1453cb8934df60c4ab906e783";
+
+        "SEGADISCSYSTEM  "u8.ToArray().CopyTo(image, 0);
+
+        MockFilereader.MockFile(0, "game.iso", image, imageSize);
+
+        /* test file hash */
+        Assert.True(RcHash.GenerateFromFile(out var hashFile, ConsoleIds.RcConsoleSegaCd, "game.iso"));
+        Assert.Equal(expectedMd5, hashFile);
+
+        /* file identification with a buffered .iso should ignore the buffer and
+         * open the media directly */
+        var iterator = new RcHashIterator();
+        HashIterator.InitializeIterator(iterator, "game.iso", image, imageSize);
+        Assert.True(HashIterator.Iterate(out var hashIterator, iterator) != 0);
+        HashIterator.DestroyIterator(iterator);
+
+        Assert.Equal(expectedMd5, hashIterator);
+    }
+
+    /* ========================================================================= */
+
     /// <summary>=========================================================================</summary>
     [Fact]
     public void TestHashSegaCd()

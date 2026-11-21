@@ -1,6 +1,6 @@
 # CLI usage
 
-RetroAchievementsSharp replicates the RAHasher 1.8.3 command line exactly — same arguments,
+RetroAchievementsSharp replicates the RAHasher 1.8.4 command line exactly — same arguments,
 same output format, same exit codes.
 
 ## Synopsis
@@ -18,7 +18,7 @@ RetroAchievementsSharp [-v] [-s systempath] system filepath...
 
 ## `scan` subcommand
 
-A RetroAchievementsSharp extension (RAHasher 1.8.3 has no subcommands) that
+A RetroAchievementsSharp extension (RAHasher 1.8.4 has no subcommands) that
 hashes a whole ROM library in one process and emits one manifest row per file.
 
 ```text
@@ -89,7 +89,7 @@ RetroAchievementsSharp PS1 game1.cue game2.cue
 
 ## Console keys and ids
 
-The console table (81 entries) is printed by running RetroAchievementsSharp with no
+The console table (82 entries) is printed by running RetroAchievementsSharp with no
 arguments. Keys are matched case-insensitively; any console can also be
 addressed by its numeric id (see the [console table](../reference/console-table.md)).
 

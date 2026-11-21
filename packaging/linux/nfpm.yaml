@@ -1,0 +1,28 @@
+name: retroachievementssharp
+arch: ${NFPM_ARCH}
+platform: linux
+version: ${NFPM_VERSION}
+release: "1"
+section: utils
+priority: optional
+maintainer: Pure Logic Code <support@purelogiccode.com>
+description: |
+  Native C# port of the RetroAchievements hashing engine (rcheevos/RAHasher).
+  Hashes ROMs and disc images for identification by RetroAchievements.
+homepage: https://github.com/purelogiccode/RetroAchievementsSharp
+license: GPL-2.0-or-later
+contents:
+  - src: ${NFPM_BINARY}
+    dst: /usr/bin/retroachievementssharp
+    expand: true
+    file_info:
+      mode: 0755
+  - src: ${NFPM_LICENSE}
+    dst: /usr/share/doc/retroachievementssharp/LICENSE
+    expand: true
+  - src: ${NFPM_NOTICES}
+    dst: /usr/share/doc/retroachievementssharp/THIRD-PARTY-NOTICES.md
+    expand: true
+  - src: ${NFPM_README}
+    dst: /usr/share/doc/retroachievementssharp/README.md
+    expand: true

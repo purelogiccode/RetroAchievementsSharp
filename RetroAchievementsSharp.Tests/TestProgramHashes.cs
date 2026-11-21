@@ -80,6 +80,30 @@ public class TestProgramHashes : IDisposable
         Assert.Equal(Md5Hex(content), hashes[0].Hash); /* the entry, not the zip bytes */
     }
 
+    /// <summary>Tests that a multi-entry arcade zip is hashed by archive filename.</summary>
+    [Fact]
+    public void GenerateHashesArcadeZipHashesArchiveName()
+    {
+        var zipPath = WriteFile("game.zip", MakeZip(archive =>
+        {
+            using (var stream = archive.CreateEntry("track1.bin").Open())
+            {
+                stream.Write("one"u8);
+            }
+
+            using (var stream = archive.CreateEntry("track2.bin").Open())
+            {
+                stream.Write("two"u8);
+            }
+        }));
+
+        var hashes = Program.GenerateHashes((int)ConsoleIds.RcConsoleArcade, zipPath);
+
+        Assert.Single(hashes);
+        Assert.Equal(ConsoleIds.RcConsoleArcade, hashes[0].ConsoleId);
+        Assert.Equal("c8d46d341bea4fd5bff866a65ff8aea9", hashes[0].Hash); /* md5("game") */
+    }
+
     /// <summary>Tests the '?' auto-detect path (consoleId above the table maximum).</summary>
     [Fact]
     public void GenerateHashesAutoDetectsByExtension()

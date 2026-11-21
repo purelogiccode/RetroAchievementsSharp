@@ -122,12 +122,13 @@ public class TestConsoles
     {
         if (!OperatingSystem.IsWindows())
         {
-            return; /* the parity harness locates RetroAchievementsSharp.Cli.exe (Windows apphost) */
+            return; /* the parity harness locates RetroAchievementsSharp.exe (Windows apphost) */
         }
 
         var result = ParityHarness.Run(ParityHarness.CliPath, ["consoles"], Directory.GetCurrentDirectory());
 
         Assert.Equal(0, result.ExitCode);
         Assert.Contains("NES", ParityHarness.ToText(result.StdOut), StringComparison.Ordinal);
+        Assert.Equal("", ParityHarness.ToText(result.StdErr));
     }
 }
