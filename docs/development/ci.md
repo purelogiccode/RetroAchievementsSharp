@@ -41,8 +41,9 @@ All CLI binaries are published with:
 
 The published apphost is copied to the user-facing name
 `RetroAchievementsSharp.exe` (Windows) or `RetroAchievementsSharp`
-(Linux/macOS). The NuGet package is packed with the release version and
-attached too.
+(Linux/macOS). The NuGet package is packed with the release version,
+published to NuGet.org on `v*` tags using the `NUGET_API_KEY` secret, and
+attached to the GitHub release too.
 
 Bundles are always staged in
 `RetroAchievementsSharp/bin/Release/` on each runner and uploaded as

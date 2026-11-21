@@ -111,8 +111,17 @@ This produces `RetroAchievementsSharp.<version>.nupkg` and
 
 ### Pushing to NuGet.org
 
+The release workflow publishes both the `.nupkg` and `.snupkg` to NuGet.org
+on every `v*` tag. Configure the repository Actions secret `NUGET_API_KEY`
+with a NuGet.org key that has push permission for `RetroAchievementsSharp`.
+
+Manual push:
+
 ```bash
 dotnet nuget push artifacts/RetroAchievementsSharp.1.1.0.nupkg \
+  --api-key <NUGET_API_KEY> \
+  --source https://api.nuget.org/v3/index.json
+dotnet nuget push artifacts/RetroAchievementsSharp.1.1.0.snupkg \
   --api-key <NUGET_API_KEY> \
   --source https://api.nuget.org/v3/index.json
 ```

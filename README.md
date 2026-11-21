@@ -1,8 +1,14 @@
 # RetroAchievementsSharp
 
 [![NuGet](https://img.shields.io/nuget/v/RetroAchievementsSharp)](https://www.nuget.org/packages/RetroAchievementsSharp)
-[![.NET](https://img.shields.io/badge/.NET-8.0%20%7C%209.0%20%7C%2010.0-512BD4)](https://dotnet.microsoft.com/download)
+[![NuGet downloads](https://img.shields.io/nuget/dt/RetroAchievementsSharp)](https://www.nuget.org/packages/RetroAchievementsSharp)
+[![CI](https://github.com/purelogiccode/RetroAchievementsSharp/actions/workflows/ci.yml/badge.svg)](https://github.com/purelogiccode/RetroAchievementsSharp/actions/workflows/ci.yml)
+[![.NET](https://img.shields.io/badge/.NET-8.0%20%7C%209.0%20%7C%2010.0%20%7C%2011.0-512BD4)](https://dotnet.microsoft.com/download)
+[![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-0078D6)](#cli-downloads)
+[![GitHub release](https://img.shields.io/github/v/release/purelogiccode/RetroAchievementsSharp)](https://github.com/purelogiccode/RetroAchievementsSharp/releases)
 [![License: GPL-2.0-or-later](https://img.shields.io/badge/license-GPL--2.0--or--later-blue.svg)](LICENSE)
+[![Docs](https://img.shields.io/badge/docs-purelogiccode.github.io-informational)](https://purelogiccode.github.io/RetroAchievementsSharp/)
+[![Security policy](https://img.shields.io/badge/security-policy-brightgreen)](SECURITY.md)
 [![Repo](https://img.shields.io/badge/github-purelogiccode%2FRetroAchievementsSharp-181717?logo=github)](https://github.com/purelogiccode/RetroAchievementsSharp)
 
 A native C# port of the **RAHasher** hashing engine (`rcheevos`
@@ -288,7 +294,9 @@ dotnet pack RetroAchievementsSharp -c Release -o artifacts
 
 The package includes the net8/9/10/11 assemblies, XML docs, the GPL-2.0-or-later
 license and third-party notices, SourceLink/symbols, and runs NuGet package
-validation on every pack. Publishing to NuGet.org:
+validation on every pack. The release workflow publishes the package and
+symbols to NuGet.org automatically on every `v*` tag (using the
+`NUGET_API_KEY` Actions secret). Manual push if needed:
 
 ```bash
 dotnet nuget push artifacts/RetroAchievementsSharp.1.1.0.nupkg --api-key <key> --source https://api.nuget.org/v3/index.json

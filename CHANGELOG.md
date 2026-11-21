@@ -6,6 +6,12 @@ The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 For the port history, see [ReleaseNotes.md](docs/ReleaseNotes.md) and the
 `docs/` site.
 
+## [Unreleased]
+
+### Changed
+- Release workflow publishes the NuGet package and symbols to NuGet.org on
+  every `v*` tag (using the `NUGET_API_KEY` Actions secret).
+
 ## [1.1.0] - 2026-11-21
 
 ### Added
@@ -88,5 +94,6 @@ For the port history, see [ReleaseNotes.md](docs/ReleaseNotes.md) and the
 
 ---
 
+[Unreleased]: https://github.com/purelogiccode/RetroAchievementsSharp/compare/v1.1.0...HEAD
 [1.1.0]: https://github.com/purelogiccode/RetroAchievementsSharp/releases/tag/v1.1.0
 [1.0.0]: https://github.com/purelogiccode/RetroAchievementsSharp/releases/tag/v1.0.0
