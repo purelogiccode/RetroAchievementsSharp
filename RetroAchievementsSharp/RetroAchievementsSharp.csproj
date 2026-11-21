@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net10.0;net9.0;net8.0;net11.0</TargetFrameworks>
+    <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
     <!-- NuGet package metadata -->
     <IsPackable>true</IsPackable>
     <PackageId>RetroAchievementsSharp</PackageId>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <Authors>Peterson Fernandes; Pure Logic Code</Authors>
     <Owners>Peterson Fernandes; Pure Logic Code</Owners>
     <Title>RetroAchievementsSharp</Title>
@@ -33,12 +33,6 @@
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
     <Deterministic>true</Deterministic>
 
-    <!-- Microsoft.SourceLink.GitHub 11.x's build-time task pulls
-         System.IO.Hashing 11, which emits TFM-support warnings for net8/net9.
-         SourceLink is PrivateAssets=all and the runtime hashing graph
-         (CHDSharp 1.6.3) resolves System.IO.Hashing 10.0.14 for those TFMs. -->
-    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
-
     <!-- XML docs are packed (GenerateDocumentationFile); CS1591 (missing
          doc comments) is an error via Directory.Build.props
          (TreatWarningsAsErrors), so new public members must be documented -->
@@ -47,19 +41,15 @@
     <!-- guards consumer compatibility on every future pack build -->
     <EnablePackageValidation>true</EnablePackageValidation>
     <Company>PureLogicCode.com</Company>
-    <AssemblyVersion>1.1.0</AssemblyVersion>
-    <FileVersion>1.1.0</FileVersion>
+    <AssemblyVersion>1.1.1</AssemblyVersion>
+    <FileVersion>1.1.1</FileVersion>
     <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- 1.6.3 is the last CHDSharp release whose net9.0 dependency graph uses
-         Microsoft.Extensions.Logging.Abstractions 10.x. CHDSharp 1.7.x pulls
-         Logging.Abstractions 11.x, whose only net9-compatible asset is
-         netstandard2.0 and drags in System.Diagnostics.DiagnosticSource 11,
-         which breaks System.Net.Http on .NET 9. CHDSharp 1.7.0/1.7.1 contain
-         no public API or reader changes (TFM support and encoder fixes only);
-         the net10.0 reader is used on net11.0. -->
+    <!-- CHDSharp 1.7.x requires Microsoft.Extensions.Logging.Abstractions 11,
+         which is only usable on net10.0+; that is why this library no longer
+         targets net8.0/net9.0. -->
     <PackageReference Include="CHDSharp" Version="1.7.1" />
     <PackageReference Include="RVZSharp" Version="1.2.0" />
     <PackageReference Include="Serilog" Version="4.4.0" />

@@ -17,13 +17,13 @@ rcheevos 12.2.1) and since evolved to rcheevos 12.5.0 / RAHasher 1.8.4.
   original C binaries with identical arguments and requires byte-identical
   stdout/stderr and equal exit codes: **90/90 corpus cases green** against
   the source-built C oracle; **439/439 fast tests + 172/172 slow
-  tests green on each of net8.0, net9.0, net10.0, net11.0** (Debug + Release).
+  tests green on each of net10.0, net11.0** (Debug + Release).
 - **82 consoles** in the CLI table — cartridge, disc, encrypted (3DS), CHD
   (including differential parent/child sets), PS3, RVZ/WIA (GameCube/Wii,
   hashed live — no rvz→iso conversion), zip-based (Arduboy FX, DOSZ/DOSC)
   and `.neo` Neo Geo cart formats.
 - **Cross-platform** — `RetroAchievementsSharp` is a NuGet library targeting
-  `net8.0;net9.0;net10.0;net11.0`; the CLI publishes self-contained single-file
+  `net10.0;net11.0`; the CLI publishes self-contained single-file
   executables for Windows x64/arm64, Linux x64/arm64, and macOS x64/arm64.
 - **Honest engineering** — the port reproduces the original's quirks
   (64 MiB whole-file cap, `atoi` console-key fallback, wildcard path
@@ -68,13 +68,13 @@ RetroAchievementsSharp.Cli/bin/Release/net11.0/RetroAchievementsSharp.exe '?' un
 - **Reference** — [console table](reference/console-table.md),
   [hashing semantics](reference/hashing-semantics.md), [public API](reference/public-api.md),
   [known quirks](reference/known-quirks.md), [parity evidence](reference/parity-evidence.md)
-- **Release notes** — [RetroAchievementsSharp 1.0.0](ReleaseNotes.md)
+- **Release notes** — [RetroAchievementsSharp 1.1.1](ReleaseNotes.md)
 
 ## Repository layout
 
 ```
 RetroAchievementsSharp.sln                 solution (Core + Cli + Tests)
-Directory.Build.props       net8.0/9.0/10.0 multi-targeting, nullable, warnings-as-errors
+Directory.Build.props       net10.0/net11.0 multi-targeting, nullable, warnings-as-errors
 mkdocs.yml                  this documentation site
 docs/                       these pages
 RetroAchievementsSharp/               the hashing engine (class library)

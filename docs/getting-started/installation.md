@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - **.NET 11 SDK** — all three projects multi-target the portable
-  `net8.0;net9.0;net10.0;net11.0` TFMs (`global.json` pins the .NET 11 SDK;
+  `net10.0;net11.0` TFMs (`global.json` pins the .NET 11 SDK;
   .NET 10 SDK is required only to test the `net10.0` target). Install from
   <https://dotnet.microsoft.com/download> or your package manager
   (`apt install dotnet-sdk-10.0`, `winget install Microsoft.DotNet.SDK.10`, …).
@@ -12,13 +12,13 @@
 - **Windows, Linux, macOS** all work for building; the CLI publishes for
   Windows x64/arm64, Linux x64/arm64, and macOS x64/arm64 (see
   [Publishing](publishing.md)). Release CLI bundles include the .NET 11
-  runtime; the NuGet library targets .NET 8, 9, 10, and 11.
+  runtime; the NuGet library targets .NET 10 and 11.
 - The **parity test suite additionally needs a C-built oracle binary on
   Windows** — see [Building the oracles](../development/oracles.md). Without
   one, the Tier-2 parity cases skip (the ported vectors still run).
 
 `RetroAchievementsSharp` is also available as a **NuGet package**
-(`dotnet add package RetroAchievementsSharp`) for use from any net8.0+ application —
+(`dotnet add package RetroAchievementsSharp`) for use from any net10.0+ application —
 see [Packaging the library](publishing.md#packaging-the-library).
 
 ## Install the CLI
@@ -29,7 +29,7 @@ Windows Package Manager (portable, no .NET install required):
 winget install PureLogicCode.RetroAchievementsSharp
 ```
 
-.NET global tool (Windows, Linux, macOS with .NET 8+):
+.NET global tool (Windows, Linux, macOS with .NET 10+):
 
 ```bash
 dotnet tool install --global RetroAchievementsSharp.Cli
@@ -74,8 +74,8 @@ dotnet test RetroAchievementsSharp.sln -c Release            # fast suite
 dotnet test RetroAchievementsSharp.Slow.Tests -c Release     # slow suite (parity; manual)
 ```
 
-Expected result: **415 passed, 0 failed per TFM on the fast suite**
-(net8.0, net9.0, net10.0, net11.0), **172 passed on the slow suite**. The suites
+Expected result: **439 passed, 0 failed per TFM on the fast suite**
+(net10.0, net11.0), **172 passed on the slow suite**. The suites
 have several tiers — see [Testing](../development/testing.md) for details
 and how to filter them.
 
@@ -99,4 +99,4 @@ RetroAchievementsSharp.Cli/bin/Release/net11.0/RetroAchievementsSharp.exe
 | `error NETSDK1005: Assets file ... not found` | run `dotnet restore` once |
 | parity tests report `SKIPPED` | no usable oracle found on a Windows host — build one (see [oracles](../development/oracles.md)) or set `RASHARP_ORACLE` |
 | build fails on a warning | `TreatWarningsAsErrors` is on by design; fix the warning rather than suppressing it |
-| `RetroAchievementsSharp.exe` not found under `bin/Release/net11.0-windows` | the projects target portable `net8.0;net9.0;net10.0;net11.0` — look under `bin/Release/<tfm>/` (any of the four works) |
+| `RetroAchievementsSharp.exe` not found under `bin/Release/net11.0-windows` | the projects target portable `net10.0;net11.0` — look under `bin/Release/<tfm>/` (either works) |

@@ -14,7 +14,7 @@ namespace RetroAchievementsSharp.Cli;
 internal static class Program
 {
     /// <summary>The application version string.</summary>
-    internal const string Version = "1.1.0";
+    internal const string Version = "1.1.1";
 
     /// <summary>main.</summary>
     /// <param name="args">the command-line arguments</param>

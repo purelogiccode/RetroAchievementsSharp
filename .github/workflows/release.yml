@@ -302,7 +302,7 @@ jobs:
           dotnet pack RetroAchievementsSharp/RetroAchievementsSharp.csproj \
             -c Release -p:Version="${VERSION}" -o "${BUNDLE_DIR}"
           dotnet pack RetroAchievementsSharp.Cli/RetroAchievementsSharp.Cli.csproj \
-            -c Release -p:TargetFrameworks=net8.0 -p:Version="${VERSION}" -o "${BUNDLE_DIR}"
+            -c Release -p:Version="${VERSION}" -o "${BUNDLE_DIR}"
 
       - name: Publish to NuGet.org
         if: startsWith(github.ref, 'refs/tags/v')

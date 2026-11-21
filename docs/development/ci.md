@@ -5,7 +5,7 @@
 `.github/workflows/ci.yml` runs on pushes to `master`, pull requests, and
 manual dispatch:
 
-- `test` matrix — Ubuntu, Windows, and macOS, with .NET 8/9/10/11 installed;
+- `test` matrix — Ubuntu, Windows, and macOS, with .NET 10/11 installed;
   restores, builds (warnings are errors), and runs the fast xUnit suite on
   every target framework. It also packs the CLI .NET tool and installs/runs
   it from a temporary feed.
@@ -66,7 +66,7 @@ creating a release. Do not push a release tag until the maintainer asks.
 On Windows:
 
 ```powershell
-./scripts/build-release.ps1 -Version 1.1.0
+./scripts/build-release.ps1 -Version 1.1.1
 ```
 
 This produces Windows `.zip`, Linux `.tar.gz`, `.deb`/`.rpm` (when `nfpm` is

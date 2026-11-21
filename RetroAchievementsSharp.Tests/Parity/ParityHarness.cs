@@ -186,7 +186,7 @@ public static class ParityHarness
          * then fall back through the remaining targets */
         var currentTfm = AppContext.TargetFrameworkName;
         var tfms = new List<string> { currentTfm! }
-            .Concat(new[] { "net10.0", "net9.0", "net8.0" }.Where(tfm => !string.Equals(tfm, currentTfm, StringComparison.Ordinal)))
+            .Concat(new[] { "net11.0", "net10.0" }.Where(tfm => !string.Equals(tfm, currentTfm, StringComparison.Ordinal)))
             .Distinct(StringComparer.Ordinal).ToArray();
 
         foreach (var config in new[] { "Debug", "Release" })

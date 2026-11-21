@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net10.0;net9.0;net8.0;net11.0</TargetFrameworks>
+        <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
         <OutputType>Exe</OutputType>
         <AssemblyName>RetroAchievementsSharp.Cli</AssemblyName>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -12,7 +12,7 @@
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>retroachievementssharp</ToolCommandName>
         <PackageId>RetroAchievementsSharp.Cli</PackageId>
-        <Version>1.1.0</Version>
+        <Version>1.1.1</Version>
         <Authors>Peterson Fernandes; Pure Logic Code</Authors>
         <Owners>Peterson Fernandes; Pure Logic Code</Owners>
         <Title>RetroAchievementsSharp CLI</Title>
@@ -35,8 +35,8 @@
 
         <ApplicationIcon>icon\icon.ico</ApplicationIcon>
         <Company>PureLogicCode.com</Company>
-        <AssemblyVersion>1.1.0</AssemblyVersion>
-        <FileVersion>1.1.0</FileVersion>
+        <AssemblyVersion>1.1.1</AssemblyVersion>
+        <FileVersion>1.1.1</FileVersion>
         <NeutralLanguage>en</NeutralLanguage>
         <DebugType>embedded</DebugType>
         <DebugSymbols>true</DebugSymbols>

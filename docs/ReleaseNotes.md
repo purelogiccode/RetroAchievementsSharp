@@ -1,9 +1,24 @@
-# Release Notes — RetroAchievementsSharp 1.1.0
+# Release Notes — RetroAchievementsSharp 1.1.1
 
 **A native C# port of the RAHasher 1.8.4 hashing engine (rcheevos 12.5.0)
 that produces 100% identical RetroAchievements hashes** — the same hashes
 the [RetroAchievements](https://retroachievements.org) website and its
 clients use to identify ROMs and disc images.
+
+## What's new in 1.1.1
+
+- **.NET 10 and 11 only** — the library, CLI, and tests now target
+  `net10.0;net11.0`. The `net8.0`/`net9.0` targets were dropped because
+  CHDSharp 1.7.1 requires `Microsoft.Extensions.Logging.Abstractions` 11,
+  which has no compatible .NET 8/9 runtime asset. Consumers still on
+  .NET 8 or 9 should stay on 1.1.0.
+- **CHDSharp 1.7.1** — fixes FLAC frame metadata for one-frame-per-hunk CD
+  audio; no public API or encoder-output changes.
+- **CLI .NET global tool and winget** — install with
+  `dotnet tool install --global RetroAchievementsSharp.Cli` on any OS, or
+  `winget install PureLogicCode.RetroAchievementsSharp` on Windows.
+- **Release automation** — `v*` tags publish the library, CLI tool, and
+  symbols to NuGet.org; GitHub releases attach only the platform bundles.
 
 ## Highlights
 
@@ -19,8 +34,8 @@ clients use to identify ROMs and disc images.
 - **`scan --console` and `scan --out`** — force one console for a whole
   batch and write manifests atomically; JSON rows include the full path.
 - **Byte-exact parity with the C engine** — **439/439 fast tests + 172/172
-  slow tests** green on `net8.0`, `net9.0`, `net10.0`, and `net11.0`,
-  including the Tier-2 parity harness against source-built C oracles.
+  slow tests** green on `net10.0` and `net11.0`, including the Tier-2
+  parity harness against source-built C oracles.
 - **Cross-platform release bundles** — Windows, Linux, and macOS x64/arm64,
   with the .NET 11 runtime bundled so no runtime install is required.
 - **Project automation and security** — GitHub Actions CI, release bundles,
@@ -29,8 +44,7 @@ clients use to identify ROMs and disc images.
 
 ## Requirements
 
-- **.NET 8, 9, 10, or 11** for the library (older runtimes are not
-  supported).
+- **.NET 10 or 11** for the library (older runtimes are not supported).
 - No native dependencies — 100% managed.
 
 ## Supported formats
@@ -51,18 +65,18 @@ including classic microcomputers.
 
 | Asset | Platform |
 |---|---|
-| `retroachievementssharp_v1.1.0_win-x64.zip` | Windows x64 (self-contained, single-file) |
-| `retroachievementssharp_v1.1.0_win-arm64.zip` | Windows arm64 (self-contained, single-file) |
-| `retroachievementssharp_v1.1.0_linux-x64.tar.gz` | Linux x64 (portable) |
-| `retroachievementssharp_v1.1.0_linux-arm64.tar.gz` | Linux arm64 (portable) |
-| `retroachievementssharp_v1.1.0_amd64.deb` | Debian/Ubuntu x64 |
-| `retroachievementssharp_v1.1.0_arm64.deb` | Debian/Ubuntu arm64 |
-| `retroachievementssharp_v1.1.0-1.x86_64.rpm` | Fedora/RHEL x64 |
-| `retroachievementssharp_v1.1.0-1.aarch64.rpm` | Fedora/RHEL arm64 |
-| `retroachievementssharp_v1.1.0_macos-x64.dmg` | macOS Intel |
-| `retroachievementssharp_v1.1.0_macos-arm64.dmg` | macOS Apple Silicon |
-| `retroachievementssharp_v1.1.0_macos-x64.tar.gz` | macOS Intel (portable CLI) |
-| `retroachievementssharp_v1.1.0_macos-arm64.tar.gz` | macOS Apple Silicon (portable CLI) |
+| `retroachievementssharp_v1.1.1_win-x64.zip` | Windows x64 (self-contained, single-file) |
+| `retroachievementssharp_v1.1.1_win-arm64.zip` | Windows arm64 (self-contained, single-file) |
+| `retroachievementssharp_v1.1.1_linux-x64.tar.gz` | Linux x64 (portable) |
+| `retroachievementssharp_v1.1.1_linux-arm64.tar.gz` | Linux arm64 (portable) |
+| `retroachievementssharp_v1.1.1_amd64.deb` | Debian/Ubuntu x64 |
+| `retroachievementssharp_v1.1.1_arm64.deb` | Debian/Ubuntu arm64 |
+| `retroachievementssharp_v1.1.1-1.x86_64.rpm` | Fedora/RHEL x64 |
+| `retroachievementssharp_v1.1.1-1.aarch64.rpm` | Fedora/RHEL arm64 |
+| `retroachievementssharp_v1.1.1_macos-x64.dmg` | macOS Intel |
+| `retroachievementssharp_v1.1.1_macos-arm64.dmg` | macOS Apple Silicon |
+| `retroachievementssharp_v1.1.1_macos-x64.tar.gz` | macOS Intel (portable CLI) |
+| `retroachievementssharp_v1.1.1_macos-arm64.tar.gz` | macOS Apple Silicon (portable CLI) |
 
 The library, CLI tool, and symbols are published to
 [NuGet.org](https://www.nuget.org/packages/RetroAchievementsSharp); the
@@ -79,7 +93,7 @@ winget install PureLogicCode.RetroAchievementsSharp
 ```
 
 ```bash
-# .NET global tool (Windows, Linux, macOS with .NET 8+)
+# .NET global tool (Windows, Linux, macOS with .NET 10+)
 dotnet tool install --global RetroAchievementsSharp.Cli
 ```
 

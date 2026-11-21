@@ -15,7 +15,7 @@ to reproduce it.
 | Real-ROM parity cases | **61/61 byte-identical** vs the pinned **1.8.3** binary (user libraries, incl. 3DS with user keys) |
 | Tier-1 ported vectors | all upstream `test/rhash` vectors green |
 | CLI output | byte-identical (stdout + stderr + exit codes), including verbose mode and error paths |
-| Platforms | `net8.0;net9.0;net10.0;net11.0` (439/439 + 172/172 green on each); CLI publishes win/linux/macos x64+arm64 |
+| Platforms | `net10.0;net11.0` (439/439 + 172/172 green on each); CLI publishes win/linux/macos x64+arm64 |
 
 ## The tiers
 

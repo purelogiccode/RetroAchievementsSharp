@@ -8,6 +8,8 @@ For the port history, see [ReleaseNotes.md](docs/ReleaseNotes.md) and the
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-11-21
+
 ### Added
 - `RetroAchievementsSharp.Cli` .NET global tool (command
   `retroachievementssharp`), installable with
@@ -16,12 +18,19 @@ For the port history, see [ReleaseNotes.md](docs/ReleaseNotes.md) and the
   Windows x64/arm64 CLI bundles.
 
 ### Changed
+- CHDSharp updated to 1.7.1: FLAC frame metadata is sized for
+  one-frame-per-hunk CD audio; no public API or encoder-output changes.
 - Release workflow publishes the library, the CLI tool, and symbols to
   NuGet.org on every `v*` tag (using the `NUGET_API_KEY` Actions secret).
 - GitHub releases attach only the platform bundles; the `.nupkg`/`.snupkg`
   files are published to NuGet.org only.
 - Release workflow updates the winget manifest on every `v*` tag via
   `wingetcreate` (using the `WINGET_TOKEN` secret).
+
+### Removed
+- **Breaking:** the `net8.0` and `net9.0` targets. CHDSharp 1.7.1 requires
+  `Microsoft.Extensions.Logging.Abstractions` 11, which has no compatible
+  .NET 8/9 runtime asset; consumers on those runtimes should stay on 1.1.0.
 
 ## [1.1.0] - 2026-11-21
 
@@ -105,6 +114,7 @@ For the port history, see [ReleaseNotes.md](docs/ReleaseNotes.md) and the
 
 ---
 
-[Unreleased]: https://github.com/purelogiccode/RetroAchievementsSharp/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/purelogiccode/RetroAchievementsSharp/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/purelogiccode/RetroAchievementsSharp/releases/tag/v1.1.1
 [1.1.0]: https://github.com/purelogiccode/RetroAchievementsSharp/releases/tag/v1.1.0
 [1.0.0]: https://github.com/purelogiccode/RetroAchievementsSharp/releases/tag/v1.0.0

@@ -1,5 +1,19 @@
 # What's new
 
+## 1.1.1 — 2026-11-21
+
+- **.NET 10/11 only** — the library, CLI, and tests now target `net10.0`
+  and `net11.0`; .NET 8/9 support was dropped because CHDSharp 1.7.1
+  requires `Microsoft.Extensions.Logging.Abstractions` 11. Stay on 1.1.0
+  if you need net8.0/net9.0.
+- **CHDSharp 1.7.1** — fixes FLAC frame metadata for one-frame-per-hunk CD
+  audio.
+- **CLI .NET global tool** —
+  `dotnet tool install --global RetroAchievementsSharp.Cli`.
+- **winget** — `winget install PureLogicCode.RetroAchievementsSharp`.
+- **Release automation** — `v*` tags publish the library, CLI tool, and
+  symbols to NuGet.org; GitHub releases carry only the platform bundles.
+
 ## 1.1.0 — 2026-11-21
 
 - **PlayStation 3 hashing** — `.iso`/`.chd` discs, extracted retail folders,

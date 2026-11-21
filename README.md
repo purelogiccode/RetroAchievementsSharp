@@ -20,7 +20,7 @@ to the original for every supported console — the same hashes the
 use to identify ROMs and disc images.
 
 - **Library** — `RetroAchievementsSharp` ([NuGet](https://www.nuget.org/packages/RetroAchievementsSharp)),
-  targets `net8.0`, `net9.0`, `net10.0`, and `net11.0`; GPL-2.0-or-later.
+  targets `net10.0` and `net11.0`; GPL-2.0-or-later.
 - **CLI** — `RetroAchievementsSharp.exe`, byte-identical in behavior to `RAHasher 1.8.4`,
   plus convenience subcommands (`scan`, `identify`, `consoles`, `checkkeys`,
   `fetch-db`). Install with `winget` on Windows or as the
@@ -30,9 +30,9 @@ use to identify ROMs and disc images.
   against source-built C oracles, RVZ-vs-ISO equality on real GameCube/Wii
   discs, and spot checks against the published RetroAchievements game
   database.
-- **1.1.0 highlights** — PS3 hashing, differential CHDs, `scan --console`/
-  `--out`, CI/release automation, and security hardening. See
-  [WHATS_NEW.md](WHATS_NEW.md).
+- **1.1.1 highlights** — .NET 10/11 with CHDSharp 1.7.1, the
+  `RetroAchievementsSharp.Cli` .NET tool, winget packaging, and release
+  automation. See [WHATS_NEW.md](WHATS_NEW.md).
 
 ## Installation
 
@@ -48,12 +48,12 @@ dotnet add package RetroAchievementsSharp
 # Windows Package Manager
 winget install PureLogicCode.RetroAchievementsSharp
 
-# or, on any OS with .NET 8+
+# or, on any OS with .NET 10+
 dotnet tool install --global RetroAchievementsSharp.Cli
 retroachievementssharp NES game.nes
 ```
 
-Works with the .NET 8, 9, 10, and 11 SDKs/runtimes on Windows, Linux, macOS,
+Works with the .NET 10 and 11 SDKs/runtimes on Windows, Linux, macOS,
 x64 and arm64. The release CLI bundles the .NET 11 runtime, so end users do
 not need .NET installed.
 
@@ -71,7 +71,7 @@ executable.
 
 ## Using the library
 
-Requires **.NET 8, 9, 10, or 11** (older runtimes are not supported). Add the
+Requires **.NET 10 or 11** (older runtimes are not supported). Add the
 package:
 
 ```
@@ -265,8 +265,8 @@ dotnet build RetroAchievementsSharp.sln -c Release
 ```
 
 Requires the .NET 11 SDK (see `global.json`). All three projects multi-target
-`net8.0;net9.0;net10.0;net11.0`; the library package is compatible with
-.NET 8, 9, 10, and 11. Build a single target with `-f net8.0` (faster).
+`net10.0;net11.0`; the library package is compatible with .NET 10 and 11.
+Build a single target with `-f net10.0` (faster).
 
 ## Publishing the CLI
 
@@ -282,7 +282,7 @@ runtime bundled (no runtime install needed on the target):
 Build locally on Windows:
 
 ```powershell
-./scripts/build-release.ps1 -Version 1.1.0
+./scripts/build-release.ps1 -Version 1.1.1
 ```
 
 Bundles are written to `RetroAchievementsSharp/bin/Release/` and existing files
@@ -304,14 +304,14 @@ on Windows; on Linux the parity cases skip and the ported vectors still run.)
 
 ```sh
 dotnet pack RetroAchievementsSharp -c Release
-# publishes RetroAchievementsSharp.1.1.0.nupkg + .snupkg (default: bin/Release); make artifacts/:
+# publishes RetroAchievementsSharp.1.1.1.nupkg + .snupkg (default: bin/Release); make artifacts/:
 dotnet pack RetroAchievementsSharp -c Release -o artifacts
 
-# the CLI .NET tool (net8.0, command: retroachievementssharp)
-dotnet pack RetroAchievementsSharp.Cli -c Release -p:TargetFrameworks=net8.0 -o artifacts
+# the CLI .NET tool (net10.0/net11.0, command: retroachievementssharp)
+dotnet pack RetroAchievementsSharp.Cli -c Release -o artifacts
 ```
 
-The package includes the net8/9/10/11 assemblies, XML docs, the GPL-2.0-or-later
+The package includes the net10/11 assemblies, XML docs, the GPL-2.0-or-later
 license and third-party notices, SourceLink/symbols, and runs NuGet package
 validation on every pack. The release workflow publishes the library, the
 `RetroAchievementsSharp.Cli` .NET tool, and symbols to NuGet.org
@@ -319,7 +319,7 @@ automatically on every `v*` tag (using the `NUGET_API_KEY` Actions secret).
 Manual push if needed:
 
 ```bash
-dotnet nuget push artifacts/RetroAchievementsSharp.1.1.0.nupkg --api-key <key> --source https://api.nuget.org/v3/index.json
+dotnet nuget push artifacts/RetroAchievementsSharp.1.1.1.nupkg --api-key <key> --source https://api.nuget.org/v3/index.json
 ```
 
 See [publishing.md](docs/getting-started/publishing.md) for details.
@@ -329,7 +329,7 @@ See [publishing.md](docs/getting-started/publishing.md) for details.
 Tests are split into two projects:
 
 ```bash
-dotnet test RetroAchievementsSharp.sln -c Release          # fast suite, all TFMs (net8, net9, net10)
+dotnet test RetroAchievementsSharp.sln -c Release          # fast suite, all TFMs (net10, net11)
 dotnet test RetroAchievementsSharp.sln -f net11.0          # fast suite, one TFM
 dotnet test RetroAchievementsSharp.Slow.Tests -c Release   # slow suite (manual — not in the sln)
 ```
@@ -359,7 +359,7 @@ unsupported-format behavior (ROM encoding not part of rcheevos).
 
 ## Parity evidence
 
-Current: **439/439 fast + 172/172 slow green on net8.0, net9.0, net10.0, net11.0** —
+Current: **439/439 fast + 172/172 slow green on net10.0, net11.0** —
 byte-identical CLI output between `RetroAchievementsSharp.exe` and the C oracles,
 including verbose mode, error paths, and exit codes; RVZ-vs-ISO equality
 6/6 (GameCube and Wii); real-ROM parity 61/61; published-hash spot-check

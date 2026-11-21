@@ -2,7 +2,7 @@
 
 RetroAchievementsSharp ships two kinds of artifacts:
 
-1. **The `RetroAchievementsSharp` NuGet library** (`net8.0;net9.0;net10.0;net11.0`)
+1. **The `RetroAchievementsSharp` NuGet library** (`net10.0;net11.0`)
    — for consumers; see [Packaging the library](#packaging-the-library).
 2. **Self-contained, single-file CLI executables** — the .NET 11 runtime is
    bundled, so no runtime install is needed on the target. The executable is
@@ -42,7 +42,7 @@ Windows can build the Windows zips, Linux `.tar.gz`, `.deb`/`.rpm` (when
 NuGet package:
 
 ```powershell
-./scripts/build-release.ps1 -Version 1.1.0
+./scripts/build-release.ps1 -Version 1.1.1
 ```
 
 The script writes bundles to `RetroAchievementsSharp/bin/Release/` and
@@ -52,7 +52,7 @@ The script writes bundles to `RetroAchievementsSharp/bin/Release/` and
 DMG bundles require macOS tooling, so CI builds them on a native macOS runner.
 AppImage/Flatpak metadata remains under `packaging/flatpak/` and
 `packaging/linux/` for a possible future release, but is not part of the
-default 1.1.0 bundle set.
+default 1.1.1 bundle set.
 
 ## Winget
 
@@ -114,7 +114,7 @@ behavior is preserved.
 ## Packaging the library
 
 `RetroAchievementsSharp` is packable and carries complete NuGet metadata:
-`net8.0;net9.0;net10.0;net11.0` assemblies, XML docs on every public member
+`net10.0;net11.0` assemblies, XML docs on every public member
 (CS1591 is an error), the GPL-2.0-or-later license and third-party notices, a
 package icon, SourceLink (with symbols), repository metadata, and a
 `PackageReleaseNotes` link to `CHANGELOG.md`. Package validation runs on
@@ -133,7 +133,7 @@ The CLI is also a .NET global tool (`RetroAchievementsSharp.Cli`, command
 `retroachievementssharp`):
 
 ```bash
-dotnet pack RetroAchievementsSharp.Cli -c Release -p:TargetFrameworks=net8.0 -o artifacts
+dotnet pack RetroAchievementsSharp.Cli -c Release -o artifacts
 ```
 
 Install it from the local feed:
@@ -143,8 +143,8 @@ dotnet tool install --global --add-source artifacts RetroAchievementsSharp.Cli
 retroachievementssharp NES game.nes
 ```
 
-The release workflow packs the tool for `net8.0` and publishes it alongside
-the library.
+The release workflow packs the tool for `net10.0`/`net11.0` and publishes it
+alongside the library.
 
 ### Pushing to NuGet.org
 
@@ -156,13 +156,13 @@ with a NuGet.org key that has push permission for both
 Manual push:
 
 ```bash
-dotnet nuget push artifacts/RetroAchievementsSharp.1.1.0.nupkg \
+dotnet nuget push artifacts/RetroAchievementsSharp.1.1.1.nupkg \
   --api-key <NUGET_API_KEY> \
   --source https://api.nuget.org/v3/index.json
-dotnet nuget push artifacts/RetroAchievementsSharp.1.1.0.snupkg \
+dotnet nuget push artifacts/RetroAchievementsSharp.1.1.1.snupkg \
   --api-key <NUGET_API_KEY> \
   --source https://api.nuget.org/v3/index.json
-dotnet nuget push artifacts/RetroAchievementsSharp.Cli.1.1.0.nupkg \
+dotnet nuget push artifacts/RetroAchievementsSharp.Cli.1.1.1.nupkg \
   --api-key <NUGET_API_KEY> \
   --source https://api.nuget.org/v3/index.json
 ```

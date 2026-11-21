@@ -2,9 +2,9 @@
   <PropertyGroup>
     <!-- Each project declares its own TargetFrameworks: RetroAchievementsSharp,
          RetroAchievementsSharp.Cli and RetroAchievementsSharp.Tests all
-         multi-target net8.0;net9.0;net10.0;net11.0. CHDSharp,
-         RVZSharp, VideoGameFileSystemParser, and Serilog ship libraries
-         compatible with every supported TFM. -->
+         multi-target net10.0;net11.0. CHDSharp, RVZSharp,
+         VideoGameFileSystemParser, and Serilog ship libraries compatible with
+         every supported TFM. -->
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

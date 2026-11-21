@@ -21,7 +21,7 @@
     Drop folder. Defaults to RetroAchievementsSharp/bin/Release in the repo.
 
 .EXAMPLE
-    ./scripts/build-release.ps1 -Version 1.1.0
+    ./scripts/build-release.ps1 -Version 1.1.1
 #>
 param(
     [string]$Version,
@@ -163,7 +163,7 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'dotnet pack failed' }
 
         Write-Host 'Packing NuGet CLI tool ...'
-        & dotnet pack (Join-Path $repoRoot 'RetroAchievementsSharp.Cli/RetroAchievementsSharp.Cli.csproj') -c Release -p:TargetFrameworks=net8.0 -p:Version=$Version -o $OutputRoot | Out-Host
+        & dotnet pack (Join-Path $repoRoot 'RetroAchievementsSharp.Cli/RetroAchievementsSharp.Cli.csproj') -c Release -p:Version=$Version -o $OutputRoot | Out-Host
         if ($LASTEXITCODE -ne 0) { throw 'dotnet pack (CLI tool) failed' }
     }
 

@@ -22,7 +22,7 @@ CHANGELOG entry.
 
 | Path | Contents |
 |---|---|
-| `RetroAchievementsSharp/` | Hashing library (net8.0, net9.0, net10.0, net11.0) |
+| `RetroAchievementsSharp/` | Hashing library (net10.0, net11.0) |
 | `RetroAchievementsSharp.Cli/` | Console application; output binary is `RetroAchievementsSharp.exe` |
 | `RetroAchievementsSharp.Tests/` | Fast xUnit suite |
 | `RetroAchievementsSharp.Slow.Tests/` | Manual parity / real-ROM / RVZ suite |
@@ -46,7 +46,7 @@ dotnet build RetroAchievementsSharp.sln -c Release
 dotnet test RetroAchievementsSharp.sln -c Release
 ```
 
-The fast suite must be green on **net8.0, net9.0, net10.0, and net11.0**.
+The fast suite must be green on **net10.0 and net11.0**.
 Warnings are errors (`TreatWarningsAsErrors=true`).
 
 The slow suite is manual and needs local oracles / ROM libraries:
@@ -91,7 +91,7 @@ where `<rid>` is `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`,
 Build locally:
 
 ```powershell
-./scripts/build-release.ps1 -Version 1.1.0
+./scripts/build-release.ps1 -Version 1.1.1
 ```
 
 CI uses `.github/workflows/release.yml`. It builds bundles on native runners
