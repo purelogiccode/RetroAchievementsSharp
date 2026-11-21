@@ -43,8 +43,9 @@ All CLI binaries are published with:
 The published apphost is copied to the user-facing name
 `RetroAchievementsSharp.exe` (Windows) or `RetroAchievementsSharp`
 (Linux/macOS). The library and the `RetroAchievementsSharp.Cli` .NET tool are
-packed with the release version, published to NuGet.org on `v*` tags using
-the `NUGET_API_KEY` secret, and attached to the GitHub release too.
+packed with the release version and published to NuGet.org on `v*` tags using
+the `NUGET_API_KEY` secret. The `.nupkg`/`.snupkg` files are not attached to
+the GitHub release; only the platform bundles are.
 
 After the GitHub release is published, a Windows `winget` job updates the
 `PureLogicCode.RetroAchievementsSharp` manifest in `microsoft/winget-pkgs`

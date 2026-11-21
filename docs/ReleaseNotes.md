@@ -51,8 +51,6 @@ including classic microcomputers.
 
 | Asset | Platform |
 |---|---|
-| `RetroAchievementsSharp.1.1.0.nupkg` | NuGet library (net8.0 / net9.0 / net10.0 / net11.0) |
-| `RetroAchievementsSharp.Cli.1.1.0.nupkg` | .NET global tool (net8.0, command `retroachievementssharp`) |
 | `retroachievementssharp_v1.1.0_win-x64.zip` | Windows x64 (self-contained, single-file) |
 | `retroachievementssharp_v1.1.0_win-arm64.zip` | Windows arm64 (self-contained, single-file) |
 | `retroachievementssharp_v1.1.0_linux-x64.tar.gz` | Linux x64 (portable) |
@@ -65,6 +63,10 @@ including classic microcomputers.
 | `retroachievementssharp_v1.1.0_macos-arm64.dmg` | macOS Apple Silicon |
 | `retroachievementssharp_v1.1.0_macos-x64.tar.gz` | macOS Intel (portable CLI) |
 | `retroachievementssharp_v1.1.0_macos-arm64.tar.gz` | macOS Apple Silicon (portable CLI) |
+
+The library, CLI tool, and symbols are published to
+[NuGet.org](https://www.nuget.org/packages/RetroAchievementsSharp); the
+`.nupkg`/`.snupkg` files are not attached to the GitHub release.
 
 Each CLI archive/package includes `LICENSE`, `THIRD-PARTY-NOTICES.md`, and
 `README.md` alongside the binary.

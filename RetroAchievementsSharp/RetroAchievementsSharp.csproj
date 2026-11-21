@@ -60,7 +60,7 @@
          which breaks System.Net.Http on .NET 9. CHDSharp 1.7.0/1.7.1 contain
          no public API or reader changes (TFM support and encoder fixes only);
          the net10.0 reader is used on net11.0. -->
-    <PackageReference Include="CHDSharp" Version="1.6.3" />
+    <PackageReference Include="CHDSharp" Version="1.7.1" />
     <PackageReference Include="RVZSharp" Version="1.2.0" />
     <PackageReference Include="Serilog" Version="4.4.0" />
     <PackageReference Include="VideoGameFileSystemParser" Version="1.4.0" />

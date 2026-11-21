@@ -18,6 +18,8 @@ For the port history, see [ReleaseNotes.md](docs/ReleaseNotes.md) and the
 ### Changed
 - Release workflow publishes the library, the CLI tool, and symbols to
   NuGet.org on every `v*` tag (using the `NUGET_API_KEY` Actions secret).
+- GitHub releases attach only the platform bundles; the `.nupkg`/`.snupkg`
+  files are published to NuGet.org only.
 - Release workflow updates the winget manifest on every `v*` tag via
   `wingetcreate` (using the `WINGET_TOKEN` secret).
 

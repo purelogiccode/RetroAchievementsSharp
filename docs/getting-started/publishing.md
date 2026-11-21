@@ -75,8 +75,11 @@ The first submission must be merged before automatic updates can run.
 
 - builds all six RIDs as self-contained single-file .NET 11 binaries;
 - creates the Windows/Linux/macOS bundles on native runners;
-- uploads every bundle and the NuGet package as workflow artifacts;
-- when a `v*` tag is pushed, attaches all of them to the GitHub release.
+- uploads every bundle as a workflow artifact;
+- when a `v*` tag is pushed, attaches the bundles to the GitHub release;
+- publishes the library and CLI tool packages (and symbols) to NuGet.org.
+
+The `.nupkg`/`.snupkg` files are not attached to the GitHub release.
 
 Manual `workflow_dispatch` runs build and upload artifacts without creating a
 release. **Do not create or push a release tag unless the maintainer
@@ -175,7 +178,7 @@ Before a release:
 3. Build the bundles locally with `scripts/build-release.ps1`, or run the
    release workflow manually.
 4. When the maintainer approves, push a `v<version>` tag. The release
-   workflow creates the GitHub release with all bundles, publishes the
-   library and CLI tool to NuGet.org, and updates winget-pkgs.
+   workflow creates the GitHub release with the platform bundles, publishes
+   the library and CLI tool to NuGet.org, and updates winget-pkgs.
 5. Use a NuGet API key scoped to both package IDs, and a `WINGET_TOKEN`
    classic PAT with `public_repo`; never commit either secret.
