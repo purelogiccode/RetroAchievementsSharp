@@ -46,7 +46,7 @@
         <ProjectReference Include="..\RetroAchievementsSharp\RetroAchievementsSharp.csproj" />
         <PackageReference Include="Serilog" Version="4.4.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
-    <PackageReference Update="Meziantou.Analyzer" Version="3.0.341" />
+    <PackageReference Update="Meziantou.Analyzer" Version="3.0.342" />
     </ItemGroup>
 
     <ItemGroup>
